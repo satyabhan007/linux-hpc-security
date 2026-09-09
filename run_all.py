@@ -13,6 +13,7 @@ from pathlib import Path
 MODULES = [
     "linux", "hardening", "stigs", "benchmarking", "ebpf", "ansible",
     "warewulf", "hpc", "fabric", "storage", "containers", "tuning",
+    "linux-security", "encrypted-anomaly", "fraud-detection", "key-management",
 ]
 
 ROOT = Path(__file__).resolve().parent

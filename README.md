@@ -1,19 +1,20 @@
 # linux-hpc-security — Systems Engineering from the Metal Up
 
 [![Live Site](https://img.shields.io/badge/Live%20Site-GitHub%20Pages-0a0e14?logo=githubpages&labelColor=0a0e14&color=10b981)](https://satyabhan007.github.io/linux-hpc-security/)
-[![Course](https://img.shields.io/badge/Course-12%20modules%20%C3%97%205%20levels-22d3ee)](https://satyabhan007.github.io/linux-hpc-security/learn/)
+[![Course](https://img.shields.io/badge/Course-16%20modules%20%C3%97%205%20levels-22d3ee)](https://satyabhan007.github.io/linux-hpc-security/learn/)
 [![Lab Tests](https://github.com/satyabhan007/linux-hpc-security/actions/workflows/lab-tests.yml/badge.svg)](https://github.com/satyabhan007/linux-hpc-security/actions/workflows/lab-tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg)](LICENSE)
 
 > A from-scratch, zero-black-box curriculum for the people who keep clusters
-> alive — Linux internals, security hardening, DISA STIGs, HPC benchmarking,
-> eBPF, Ansible, Warewulf, Slurm, RDMA fabric, parallel storage, containers
-> and kernel tuning — with runnable pure-Python labs that model the real
-> mechanism.
+> alive — Linux internals & security, DISA STIGs, HPC benchmarking, eBPF,
+> Ansible, Warewulf, Slurm, RDMA fabric, parallel storage, containers, kernel
+> tuning, encrypted-traffic anomaly detection, fraud/circumvention detection
+> and key-management infrastructure — with runnable pure-Python labs that
+> model the real mechanism.
 
 **Three ways in:**
-- 🌐 **[The Systems Engineering Course](https://satyabhan007.github.io/linux-hpc-security/learn/)** — 12 modules × 5 levels (analogy → expert), with checkpoint quizzes.
-- 🧪 **The labs** — 36 standalone `stepN_*.py` files, zero dependencies, CI-tested.
+- 🌐 **[The Systems Engineering Course](https://satyabhan007.github.io/linux-hpc-security/learn/)** — 16 modules × 5 levels (analogy → expert), with checkpoint quizzes.
+- 🧪 **The labs** — 48 standalone `stepN_*.py` files, zero dependencies, CI-tested.
 - 📂 **The guides** — every module has a `BEGINNER_GUIDE`, a `DEEP_DIVE` (production war-stories + real configs) and an `INTERVIEW` file (micro-detail Q&A).
 
 ---
@@ -34,9 +35,13 @@ linux-hpc-security/
 ├── storage/       # 10 · Parallel storage (Lustre/BeeGFS, striping, metadata)
 ├── containers/    # 11 · Containers & reproducibility (Apptainer, Spack, modules)
 ├── tuning/        # 12 · Kernel & performance tuning (NUMA, cgroups v2, hugepages)
+├── linux-security/    # 13 · LSM, seccomp-bpf, capabilities, namespaces, IMA/lockdown
+├── encrypted-anomaly/ # 14 · Anomaly detection on encrypted traffic (flow features, JA3/JA4, beaconing)
+├── fraud-detection/   # 15 · Fraud & circumvention detection (velocity, linkage graphs, cost-based eval)
+├── key-management/    # 16 · Key-management infra (envelope encryption, KMS/HSM, Shamir, rotation)
 │
-├── learn/         # The 12-module × 5-level course (static site)
-├── run_all.py     # Runs all 36 labs — this is what CI runs
+├── learn/         # The 16-module × 5-level course (static site)
+├── run_all.py     # Runs all 48 labs — this is what CI runs
 └── assets/        # Site CSS/JS
 ```
 
@@ -57,7 +62,7 @@ Every module has the same shape:
 git clone https://github.com/satyabhan007/linux-hpc-security.git
 cd linux-hpc-security
 
-# run the whole lab suite — 36 labs, ~10s, zero deps
+# run the whole lab suite — 48 labs, ~10s, zero deps
 python3 run_all.py
 
 # walk any module: read the guide, then run the three steps
@@ -89,6 +94,10 @@ render Warewulf overlay templates, and so on, in a few dozen readable lines.
 | Parallel storage | [Guide](storage/BEGINNER_GUIDE.md) | [Deep Dive](storage/DEEP_DIVE.md) | [Q&A](storage/INTERVIEW.md) |
 | Containers & reproducibility | [Guide](containers/BEGINNER_GUIDE.md) | [Deep Dive](containers/DEEP_DIVE.md) | [Q&A](containers/INTERVIEW.md) |
 | Kernel & performance tuning | [Guide](tuning/BEGINNER_GUIDE.md) | [Deep Dive](tuning/DEEP_DIVE.md) | [Q&A](tuning/INTERVIEW.md) |
+| Linux security (LSM/seccomp/caps) | [Guide](linux-security/BEGINNER_GUIDE.md) | [Deep Dive](linux-security/DEEP_DIVE.md) | [Q&A](linux-security/INTERVIEW.md) |
+| Anomaly detection on encrypted activity | [Guide](encrypted-anomaly/BEGINNER_GUIDE.md) | [Deep Dive](encrypted-anomaly/DEEP_DIVE.md) | [Q&A](encrypted-anomaly/INTERVIEW.md) |
+| Fraud & circumvention detection | [Guide](fraud-detection/BEGINNER_GUIDE.md) | [Deep Dive](fraud-detection/DEEP_DIVE.md) | [Q&A](fraud-detection/INTERVIEW.md) |
+| Key-management infrastructure | [Guide](key-management/BEGINNER_GUIDE.md) | [Deep Dive](key-management/DEEP_DIVE.md) | [Q&A](key-management/INTERVIEW.md) |
 
 ---
 

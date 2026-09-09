@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>linux-hpc-security — Systems Engineering from the Metal Up</title>
-    <meta name="description" content="A from-scratch, zero-black-box curriculum for Linux internals, security hardening, DISA STIGs, HPC benchmarking, eBPF, Ansible, Warewulf provisioning, RDMA fabric, parallel storage, containers and kernel tuning. Runnable pure-Python labs, deep guides, interview Q&A.">
+    <meta name="description" content="A from-scratch, zero-black-box curriculum for Linux internals & security, DISA STIGs, HPC benchmarking, eBPF, Ansible, Warewulf, RDMA fabric, parallel storage, containers, kernel tuning, encrypted-traffic anomaly detection, fraud/circumvention detection, and key-management infrastructure. Runnable pure-Python labs, deep guides, interview Q&A.">
     <meta name="color-scheme" content="dark">
     <link rel="canonical" href="https://satyabhan007.github.io/linux-hpc-security/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="linux-hpc-security">
     <meta property="og:title" content="linux-hpc-security — Systems Engineering from the Metal Up">
-    <meta property="og:description" content="Linux internals, hardening, STIGs, HPC benchmarking, eBPF, Ansible, Warewulf, RDMA fabric, parallel storage, containers, kernel tuning — explained in depth, with runnable labs and interview Q&A.">
+    <meta property="og:description" content="Linux internals & security, STIGs, HPC benchmarking, eBPF, Ansible, Warewulf, RDMA fabric, parallel storage, containers, tuning, encrypted-traffic anomaly detection, fraud detection, key management — in depth, with runnable labs and interview Q&A.">
     <meta property="og:url" content="https://satyabhan007.github.io/linux-hpc-security/">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="linux-hpc-security — Systems Engineering from the Metal Up">
-    <meta name="twitter:description" content="A from-scratch curriculum for Linux, HPC and security engineering. Runnable labs, deep guides, interview Q&A.">
+    <meta name="twitter:description" content="A from-scratch curriculum for Linux, HPC, and security engineering. Runnable labs, deep guides, interview Q&A.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐧</text></svg>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,19 +53,20 @@
             <h1>Learn the Machine <span style="background:linear-gradient(135deg,#10b981,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">From the Metal Up</span></h1>
             <p class="subtitle">
                 A from-scratch, zero-black-box curriculum for the people who keep clusters
-                alive: Linux internals, security hardening, DISA STIGs, HPC benchmarking,
-                eBPF, Ansible, Warewulf provisioning, RDMA fabric, parallel storage,
-                containers and kernel tuning — with runnable pure-Python labs that
-                model the real thing.
+                alive: Linux internals &amp; security, DISA STIGs, HPC benchmarking, eBPF,
+                Ansible, Warewulf, RDMA fabric, parallel storage, containers, kernel tuning,
+                encrypted-traffic anomaly detection, fraud/circumvention detection, and
+                key-management infrastructure — with runnable pure-Python labs that model
+                the real thing.
             </p>
             <div class="hero-actions">
-                <a href="learn/" class="btn btn-primary">Start the 12-Module Course</a>
+                <a href="learn/" class="btn btn-primary">Start the 16-Module Course</a>
                 <a href="#curriculum" class="btn btn-outline">Browse the Modules</a>
             </div>
             <div class="badge-row">
                 <span class="badge badge-green">✅ CI-tested labs</span>
                 <span class="badge badge-primary">🐍 Pure Python 3, zero deps</span>
-                <span class="badge badge-purple">📼 12 modules · 60 lessons</span>
+                <span class="badge badge-purple">📼 16 modules · 80 lessons</span>
             </div>
             <div class="scroll-indicator">
                 <span>Scroll to explore</span>
@@ -78,10 +79,10 @@
     <section class="section-sm reveal">
         <div class="container">
             <div class="stats-bar">
-                <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">Modules</div></div>
-                <div class="stat-item"><div class="stat-value">36</div><div class="stat-label">Runnable Labs</div></div>
-                <div class="stat-item"><div class="stat-value">60</div><div class="stat-label">Course Lessons</div></div>
-                <div class="stat-item"><div class="stat-value">400+</div><div class="stat-label">Interview Q&amp;A</div></div>
+                <div class="stat-item"><div class="stat-value">16</div><div class="stat-label">Modules</div></div>
+                <div class="stat-item"><div class="stat-value">48</div><div class="stat-label">Runnable Labs</div></div>
+                <div class="stat-item"><div class="stat-value">80</div><div class="stat-label">Course Lessons</div></div>
+                <div class="stat-item"><div class="stat-value">500+</div><div class="stat-label">Interview Q&amp;A</div></div>
             </div>
         </div>
     </section>
@@ -89,7 +90,7 @@
     <!-- Curriculum -->
     <section class="section reveal" id="curriculum">
         <div class="container">
-            <h2 class="section-title">Twelve Modules, One Cluster</h2>
+            <h2 class="section-title">Sixteen Modules, One Cluster</h2>
             <p class="section-subtitle">
                 Every module follows the same shape: three runnable <code class="inline">stepN_*.py</code>
                 labs that model the real mechanism with no dependencies, a
@@ -101,7 +102,7 @@
             <div class="card" style="margin-bottom:32px;border-left:3px solid #10b981;">
                 <div class="card-title">📘 Prefer a guided path?</div>
                 <p style="margin:12px 0;color:var(--text-muted);font-size:0.92rem;">
-                    The same twelve topics as a structured course — <strong>12 chapters ×
+                    The same sixteen topics as a structured course — <strong>16 chapters ×
                     5 levels</strong>, from plain-English analogy to expert view, with
                     daily-life examples and checkpoint quizzes.
                 </p>
@@ -327,6 +328,78 @@
                         <a href="tuning/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
                     </div>
                 </div>
+                <!-- 13 -->
+                <div class="card phase-card" data-phase="Security">
+                    <div class="phase-number">13</div>
+                    <div class="card-title">Linux Security — LSM, seccomp, caps</div>
+                    <div class="card-meta">capabilities • seccomp-bpf • SELinux/AppArmor • namespaces • IMA</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        The kernel guardrails a process cannot argue with. "root" split
+                        into 40 capabilities, a syscall allowlist that deletes 80% of the
+                        attack surface, SELinux type enforcement and the domain
+                        transition, and why a confined RCE goes nowhere.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="linux-security/step1_capabilities_split.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="linux-security/step2_seccomp_filter.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="linux-security/step3_selinux_typeenforce.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="linux-security/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 14 -->
+                <div class="card phase-card" data-phase="Security">
+                    <div class="phase-number">14</div>
+                    <div class="card-title">Anomaly Detection on Encrypted Activity</div>
+                    <div class="card-meta">flow features • JA3/JA4 • beaconing • exfil • DoH</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        When the payload is encrypted, the <em>shape</em> still talks.
+                        Direction/size/timing features that separate web from exfil from
+                        C2, TLS client fingerprints against an egress allowlist, and
+                        jitter-resistant beacon detection — no decryption.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="encrypted-anomaly/step1_flow_features.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="encrypted-anomaly/step2_tls_fingerprint.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="encrypted-anomaly/step3_beacon_detect.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="encrypted-anomaly/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 15 -->
+                <div class="card phase-card" data-phase="Security">
+                    <div class="phase-number">15</div>
+                    <div class="card-title">Fraud &amp; Circumvention Detection</div>
+                    <div class="card-meta">velocity rules • linkage graphs • device/bot • cost-based eval</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Judging behaviour you can't fully see: sliding-window velocity and
+                        impossible travel, linkage graphs that expose a ring one account
+                        can't, device/proxy/bot tells, and why you tune the threshold by
+                        dollars, not accuracy.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="fraud-detection/step1_velocity_rules.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="fraud-detection/step2_device_graph.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="fraud-detection/step3_eval_costs.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="fraud-detection/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 16 -->
+                <div class="card phase-card" data-phase="Security">
+                    <div class="phase-number">16</div>
+                    <div class="card-title">Key-Management Infrastructure</div>
+                    <div class="card-meta">envelope encryption • KMS/HSM • Shamir • rotation windows</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        The vault under everything. KEK/DEK hierarchies where rotation
+                        re-wraps keys not petabytes, crypto-shredding for "delete my
+                        data", k-of-n secret sharing and the key ceremony, and signing-key
+                        rotation without an auth outage.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="key-management/step1_envelope_encryption.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="key-management/step2_shamir_split.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="key-management/step3_rotation_windows.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="key-management/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -358,6 +431,10 @@
                         <tr><td>Parallel storage</td><td><a href="storage/BEGINNER_GUIDE.md">Guide</a></td><td><a href="storage/DEEP_DIVE.md">Deep Dive</a></td><td><a href="storage/INTERVIEW.md">Q&amp;A</a></td></tr>
                         <tr><td>Containers &amp; reproducibility</td><td><a href="containers/BEGINNER_GUIDE.md">Guide</a></td><td><a href="containers/DEEP_DIVE.md">Deep Dive</a></td><td><a href="containers/INTERVIEW.md">Q&amp;A</a></td></tr>
                         <tr><td>Kernel &amp; performance tuning</td><td><a href="tuning/BEGINNER_GUIDE.md">Guide</a></td><td><a href="tuning/DEEP_DIVE.md">Deep Dive</a></td><td><a href="tuning/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Linux security (LSM/seccomp/caps)</td><td><a href="linux-security/BEGINNER_GUIDE.md">Guide</a></td><td><a href="linux-security/DEEP_DIVE.md">Deep Dive</a></td><td><a href="linux-security/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Anomaly detection on encrypted activity</td><td><a href="encrypted-anomaly/BEGINNER_GUIDE.md">Guide</a></td><td><a href="encrypted-anomaly/DEEP_DIVE.md">Deep Dive</a></td><td><a href="encrypted-anomaly/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Fraud &amp; circumvention detection</td><td><a href="fraud-detection/BEGINNER_GUIDE.md">Guide</a></td><td><a href="fraud-detection/DEEP_DIVE.md">Deep Dive</a></td><td><a href="fraud-detection/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Key-management infrastructure</td><td><a href="key-management/BEGINNER_GUIDE.md">Guide</a></td><td><a href="key-management/DEEP_DIVE.md">Deep Dive</a></td><td><a href="key-management/INTERVIEW.md">Q&amp;A</a></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -416,7 +493,7 @@ cd linux-hpc-security</code></pre>
                     <div class="timeline-dot">2</div>
                     <div class="timeline-content">
                         <div class="timeline-title">Run the whole lab suite</div>
-                        <div class="timeline-desc">All 36 labs, ~10s, no dependencies. This is what CI runs on every push.</div>
+                        <div class="timeline-desc">All 48 labs, ~10s, no dependencies. This is what CI runs on every push.</div>
                         <div class="cmd-row">
                             <pre id="cmd-test"><code>python3 run_all.py</code></pre>
                             <button class="copy-btn" data-target="#cmd-test" type="button">Copy</button>

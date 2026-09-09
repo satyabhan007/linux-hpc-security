@@ -41,7 +41,8 @@ jobs:
           cp README.md LICENSE _site_pkg/ 2>/dev/null || true
           cp -r assets learn _site_pkg/
           for d in linux hardening stigs benchmarking ebpf ansible warewulf \
-                   hpc fabric storage containers tuning; do
+                   hpc fabric storage containers tuning \
+                   linux-security encrypted-anomaly fraud-detection key-management; do
             [ -d "$d" ] && mkdir -p "_site_pkg/$d" && \
               find "$d" \( -name '*.md' -o -name '*.py' -o -name '*.yml' -o -name '*.yaml' -o -name '*.sh' -o -name '*.conf' \) \
                 -not -path '*/__pycache__/*' -exec cp --parents {} _site_pkg/ \;
