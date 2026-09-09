@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>linux-hpc-security — Systems Engineering from the Metal Up</title>
+    <meta name="description" content="A from-scratch, zero-black-box curriculum for Linux internals, security hardening, DISA STIGs, HPC benchmarking, eBPF, Ansible, Warewulf provisioning, RDMA fabric, parallel storage, containers and kernel tuning. Runnable pure-Python labs, deep guides, interview Q&A.">
+    <meta name="color-scheme" content="dark">
+    <link rel="canonical" href="https://satyabhan007.github.io/linux-hpc-security/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="linux-hpc-security">
+    <meta property="og:title" content="linux-hpc-security — Systems Engineering from the Metal Up">
+    <meta property="og:description" content="Linux internals, hardening, STIGs, HPC benchmarking, eBPF, Ansible, Warewulf, RDMA fabric, parallel storage, containers, kernel tuning — explained in depth, with runnable labs and interview Q&A.">
+    <meta property="og:url" content="https://satyabhan007.github.io/linux-hpc-security/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="linux-hpc-security — Systems Engineering from the Metal Up">
+    <meta name="twitter:description" content="A from-scratch curriculum for Linux, HPC and security engineering. Runnable labs, deep guides, interview Q&A.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐧</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav-container">
+            <div class="brand">
+                <div class="brand-logo">🐧</div>
+                <div>
+                    <div class="brand-text">linux-hpc-security</div>
+                    <div class="brand-sub">Systems Engineering from the Metal Up</div>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="#curriculum">Curriculum</a>
+                <a href="learn/">Course</a>
+                <a href="#docs">Guides</a>
+                <a href="#interview">Interview Prep</a>
+                <a href="#getting-started">Getting Started</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="learn/" class="btn btn-primary btn-sm">Take the Course</a>
+                <a href="https://github.com/satyabhan007/linux-hpc-security" class="btn btn-outline btn-sm" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero reveal">
+        <div class="container">
+            <h1>Learn the Machine <span style="background:linear-gradient(135deg,#10b981,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">From the Metal Up</span></h1>
+            <p class="subtitle">
+                A from-scratch, zero-black-box curriculum for the people who keep clusters
+                alive: Linux internals, security hardening, DISA STIGs, HPC benchmarking,
+                eBPF, Ansible, Warewulf provisioning, RDMA fabric, parallel storage,
+                containers and kernel tuning — with runnable pure-Python labs that
+                model the real thing.
+            </p>
+            <div class="hero-actions">
+                <a href="learn/" class="btn btn-primary">Start the 12-Module Course</a>
+                <a href="#curriculum" class="btn btn-outline">Browse the Modules</a>
+            </div>
+            <div class="badge-row">
+                <span class="badge badge-green">✅ CI-tested labs</span>
+                <span class="badge badge-primary">🐍 Pure Python 3, zero deps</span>
+                <span class="badge badge-purple">📼 12 modules · 60 lessons</span>
+            </div>
+            <div class="scroll-indicator">
+                <span>Scroll to explore</span>
+                <span class="scroll-dot"></span><span class="scroll-dot"></span><span class="scroll-dot"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="section-sm reveal">
+        <div class="container">
+            <div class="stats-bar">
+                <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">Modules</div></div>
+                <div class="stat-item"><div class="stat-value">36</div><div class="stat-label">Runnable Labs</div></div>
+                <div class="stat-item"><div class="stat-value">60</div><div class="stat-label">Course Lessons</div></div>
+                <div class="stat-item"><div class="stat-value">400+</div><div class="stat-label">Interview Q&amp;A</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Curriculum -->
+    <section class="section reveal" id="curriculum">
+        <div class="container">
+            <h2 class="section-title">Twelve Modules, One Cluster</h2>
+            <p class="section-subtitle">
+                Every module follows the same shape: three runnable <code class="inline">stepN_*.py</code>
+                labs that model the real mechanism with no dependencies, a
+                <strong>BEGINNER_GUIDE</strong> with everyday analogies, a
+                <strong>DEEP_DIVE</strong> with production war-stories and real configs,
+                and an <strong>INTERVIEW</strong> file of micro-detail Q&amp;A.
+            </p>
+
+            <div class="card" style="margin-bottom:32px;border-left:3px solid #10b981;">
+                <div class="card-title">📘 Prefer a guided path?</div>
+                <p style="margin:12px 0;color:var(--text-muted);font-size:0.92rem;">
+                    The same twelve topics as a structured course — <strong>12 chapters ×
+                    5 levels</strong>, from plain-English analogy to expert view, with
+                    daily-life examples and checkpoint quizzes.
+                </p>
+                <a href="learn/" class="btn btn-sm btn-primary">Open the Systems Engineering Course →</a>
+            </div>
+
+            <div class="grid-3">
+                <!-- 1 -->
+                <div class="card phase-card" data-phase="Foundation">
+                    <div class="phase-number">01</div>
+                    <div class="card-title">Linux Internals &amp; the Boot Path</div>
+                    <div class="card-meta">/proc • page cache • scheduler • cgroups • namespaces</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        What actually happens between power-on and a login prompt. The
+                        virtual filesystem, the page cache, how <code class="inline">fork()</code>
+                        and the CFS/EEVDF scheduler share a CPU, and why "free memory" is
+                        a lie you should stop worrying about.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="linux/step1_proc_meminfo.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="linux/step2_page_cache_sim.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="linux/step3_scheduler_sim.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="linux/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 2 -->
+                <div class="card phase-card" data-phase="Security">
+                    <div class="phase-number">02</div>
+                    <div class="card-title">Security Hardening</div>
+                    <div class="card-meta">CIS • SSH • sudo • SELinux • auditd • attack paths</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Turning a default install into a defensible one. Baseline scoring,
+                        SSH and PAM, least-privilege sudo, SELinux vs AppArmor, kernel
+                        <code class="inline">sysctl</code> hardening, and how a small
+                        misconfiguration becomes root.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="hardening/step1_cis_score.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="hardening/step2_sshd_audit.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="hardening/step3_privesc_paths.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="hardening/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 3 -->
+                <div class="card phase-card" data-phase="Security">
+                    <div class="phase-number">03</div>
+                    <div class="card-title">STIGs &amp; Compliance Automation</div>
+                    <div class="card-meta">DISA STIG • SCAP • XCCDF/OVAL • OpenSCAP • CaC</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        How the DoD ships a hardened OS. The XCCDF/OVAL data model,
+                        CAT I/II/III severity, <code class="inline">oscap</code> scanning
+                        and remediation, SSG/ComplianceAsCode, tailoring, POA&amp;Ms, and
+                        keeping an accredited system compliant over time.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="stigs/step1_parse_xccdf.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="stigs/step2_severity_rollup.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="stigs/step3_oval_eval_sim.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="stigs/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 4 -->
+                <div class="card phase-card" data-phase="HPC">
+                    <div class="phase-number">04</div>
+                    <div class="card-title">HPC Benchmarking</div>
+                    <div class="card-meta">HPL • HPCG • STREAM • OSU • IOR • roofline</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Measuring a machine honestly. Sizing HPL for the Top500 run,
+                        STREAM and the memory wall, OSU latency/bandwidth, IOR/mdtest for
+                        storage, the roofline model, and Amdahl vs Gustafson when your
+                        scaling curve bends.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="benchmarking/step1_hpl_problem_size.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="benchmarking/step2_stream_roofline.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="benchmarking/step3_amdahl_scaling.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="benchmarking/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 5 -->
+                <div class="card phase-card" data-phase="Observability">
+                    <div class="phase-number">05</div>
+                    <div class="card-title">eBPF &amp; Observability</div>
+                    <div class="card-meta">verifier • maps • ring buffer • bpftrace • CO-RE</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Safe programs in the kernel. Why the verifier rejects your loop,
+                        how maps and the ring buffer move data to userspace, tracepoints
+                        vs kprobes vs fentry, CO-RE and BTF, and building a syscall
+                        latency histogram the way <code class="inline">bpftrace</code> does.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="ebpf/step1_verifier_sim.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="ebpf/step2_ring_buffer.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="ebpf/step3_latency_hist.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="ebpf/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 6 -->
+                <div class="card phase-card" data-phase="Automation">
+                    <div class="phase-number">06</div>
+                    <div class="card-title">Ansible Automation at Scale</div>
+                    <div class="card-meta">inventory • idempotency • roles • strategies • rolling</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Configuration as a repeatable fact. Inventory and group_vars
+                        precedence, what "idempotent" really demands of a task, handlers,
+                        <code class="inline">serial</code> rolling updates with health
+                        gates, and why <code class="inline">free</code> strategy and
+                        fact-caching decide your window.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="ansible/step1_inventory_graph.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="ansible/step2_idempotency_check.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="ansible/step3_rolling_update.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="ansible/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 7 -->
+                <div class="card phase-card" data-phase="Automation">
+                    <div class="phase-number">07</div>
+                    <div class="card-title">Warewulf Provisioning</div>
+                    <div class="card-meta">PXE/iPXE • TFTP/HTTP • overlays • stateless nodes</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Booting a thousand diskless nodes from one image. The DHCP → TFTP →
+                        iPXE → kernel/initramfs handshake, container images as node images,
+                        system vs runtime overlays, and why stateless provisioning makes a
+                        node reboot instead of a ticket.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="warewulf/step1_pxe_handshake.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="warewulf/step2_overlay_render.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="warewulf/step3_image_diff.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="warewulf/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 8 -->
+                <div class="card phase-card" data-phase="HPC">
+                    <div class="phase-number">08</div>
+                    <div class="card-title">HPC Cluster Architecture &amp; Slurm</div>
+                    <div class="card-meta">Slurm • backfill • MPI • PMIx • cgroups • fairshare</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        How a batch scheduler turns a room of servers into a shared
+                        supercomputer. Partitions and QOS, the backfill algorithm,
+                        fairshare, MPI ranks and collectives, process binding, and the
+                        control-plane daemons that must never go down.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="hpc/step1_slurm_backfill.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="hpc/step2_mpi_ring.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="hpc/step3_topology_placement.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="hpc/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 9 -->
+                <div class="card phase-card" data-phase="HPC">
+                    <div class="phase-number">09</div>
+                    <div class="card-title">Networking &amp; RDMA Fabric</div>
+                    <div class="card-meta">InfiniBand • RoCE • fat-tree • SHARP • subnet manager</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        The wires that make MPI fast. RDMA vs the kernel TCP path,
+                        InfiniBand vs RoCEv2, fat-tree bisection bandwidth and
+                        oversubscription, the subnet manager, adaptive routing, and
+                        reading <code class="inline">ibstat</code> / <code class="inline">perfquery</code>.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="fabric/step1_subnet_plan.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="fabric/step2_fat_tree_bisection.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="fabric/step3_rdma_vs_tcp.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="fabric/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 10 -->
+                <div class="card phase-card" data-phase="HPC">
+                    <div class="phase-number">10</div>
+                    <div class="card-title">Parallel Storage</div>
+                    <div class="card-meta">Lustre • BeeGFS • NFS • striping • metadata • IOR</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Feeding thousands of ranks from one filesystem. MDS/OSS/OST
+                        anatomy, stripe count and size, the metadata bottleneck and the
+                        <code class="inline">ls -l</code> that took the cluster down,
+                        progressive file layouts, and why small random I/O is the enemy.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="storage/step1_lustre_stripe.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="storage/step2_ior_throughput.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="storage/step3_metadata_storm.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="storage/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 11 -->
+                <div class="card phase-card" data-phase="HPC">
+                    <div class="phase-number">11</div>
+                    <div class="card-title">Containers &amp; Reproducibility</div>
+                    <div class="card-meta">Apptainer • SIF • Spack • EasyBuild • modules</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Making a run reproduce in five years. Apptainer/Singularity's
+                        rootless single-file model vs Docker, binding the host MPI and
+                        fabric into a container, Spack concretization and the build DAG,
+                        and environment modules / Lmod.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="containers/step1_apptainer_sif.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="containers/step2_spack_concretize.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="containers/step3_mpi_bind_mount.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="containers/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 12 -->
+                <div class="card phase-card" data-phase="Foundation">
+                    <div class="phase-number">12</div>
+                    <div class="card-title">Kernel &amp; Performance Tuning</div>
+                    <div class="card-meta">NUMA • cgroups v2 • hugepages • tuned • isolcpus</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        The last 20% of performance. NUMA locality and
+                        <code class="inline">numactl</code>, cgroups v2 resource control,
+                        hugepages and the TLB, C-states and the governor, CPU isolation
+                        and IRQ affinity, and <code class="inline">tuned</code> profiles
+                        for latency vs throughput.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="tuning/step1_numa_placement.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="tuning/step2_cgroups_v2.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="tuning/step3_hugepages_tlb.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="tuning/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation -->
+    <section class="section section-alt reveal" id="docs">
+        <div class="container">
+            <h2 class="section-title">Guide <span class="highlight">Index</span></h2>
+            <p class="section-subtitle">
+                Every module is explained three ways — plain-English analogy, a
+                production deep-dive with real configs and outage stories, and an
+                interview drill of micro-details.
+            </p>
+            <div class="card">
+                <table class="doc-table">
+                    <thead>
+                        <tr><th>Module</th><th>Beginner</th><th>Deep Dive</th><th>Interview</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Linux internals</td><td><a href="linux/BEGINNER_GUIDE.md">Guide</a></td><td><a href="linux/DEEP_DIVE.md">Deep Dive</a></td><td><a href="linux/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Security hardening</td><td><a href="hardening/BEGINNER_GUIDE.md">Guide</a></td><td><a href="hardening/DEEP_DIVE.md">Deep Dive</a></td><td><a href="hardening/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>STIGs &amp; compliance</td><td><a href="stigs/BEGINNER_GUIDE.md">Guide</a></td><td><a href="stigs/DEEP_DIVE.md">Deep Dive</a></td><td><a href="stigs/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>HPC benchmarking</td><td><a href="benchmarking/BEGINNER_GUIDE.md">Guide</a></td><td><a href="benchmarking/DEEP_DIVE.md">Deep Dive</a></td><td><a href="benchmarking/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>eBPF &amp; observability</td><td><a href="ebpf/BEGINNER_GUIDE.md">Guide</a></td><td><a href="ebpf/DEEP_DIVE.md">Deep Dive</a></td><td><a href="ebpf/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Ansible automation</td><td><a href="ansible/BEGINNER_GUIDE.md">Guide</a></td><td><a href="ansible/DEEP_DIVE.md">Deep Dive</a></td><td><a href="ansible/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Warewulf provisioning</td><td><a href="warewulf/BEGINNER_GUIDE.md">Guide</a></td><td><a href="warewulf/DEEP_DIVE.md">Deep Dive</a></td><td><a href="warewulf/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>HPC / Slurm architecture</td><td><a href="hpc/BEGINNER_GUIDE.md">Guide</a></td><td><a href="hpc/DEEP_DIVE.md">Deep Dive</a></td><td><a href="hpc/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Networking &amp; RDMA fabric</td><td><a href="fabric/BEGINNER_GUIDE.md">Guide</a></td><td><a href="fabric/DEEP_DIVE.md">Deep Dive</a></td><td><a href="fabric/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Parallel storage</td><td><a href="storage/BEGINNER_GUIDE.md">Guide</a></td><td><a href="storage/DEEP_DIVE.md">Deep Dive</a></td><td><a href="storage/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Containers &amp; reproducibility</td><td><a href="containers/BEGINNER_GUIDE.md">Guide</a></td><td><a href="containers/DEEP_DIVE.md">Deep Dive</a></td><td><a href="containers/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Kernel &amp; performance tuning</td><td><a href="tuning/BEGINNER_GUIDE.md">Guide</a></td><td><a href="tuning/DEEP_DIVE.md">Deep Dive</a></td><td><a href="tuning/INTERVIEW.md">Q&amp;A</a></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interview -->
+    <section class="section reveal" id="interview">
+        <div class="container">
+            <h2 class="section-title">Built for the <span class="highlight">Interview</span></h2>
+            <p class="section-subtitle">
+                Each <code class="inline">INTERVIEW.md</code> is a drill of the exact
+                micro-details that come up in Linux / HPC / DevSecOps screens — asked
+                as a question, answered in a few tight sentences, with the "why it
+                matters" that separates a memorised answer from an understood one.
+            </p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-header"><div class="card-icon">🧠</div><div><div class="card-title">Concept checks</div><div class="card-meta">"What is a major vs minor page fault?"</div></div></div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">Definitions you must be able to give cold, with the one detail interviewers probe for.</p>
+                </div>
+                <div class="card">
+                    <div class="card-header"><div class="card-icon">🔧</div><div><div class="card-title">Debug drills</div><div class="card-meta">"Load is 40, CPU is 3% — explain."</div></div></div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">Symptom → hypotheses → the command that confirms it, for the classic failure modes.</p>
+                </div>
+                <div class="card">
+                    <div class="card-header"><div class="card-icon">📐</div><div><div class="card-title">Back-of-envelope</div><div class="card-meta">"Size HPL for 64 nodes × 512 GB."</div></div></div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">The formulas — HPL N, bisection bandwidth, Amdahl limit, stripe count — worked in your head.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Getting Started -->
+    <section class="section section-alt reveal" id="getting-started">
+        <div class="container">
+            <h2 class="section-title">Quick Start</h2>
+            <p class="section-subtitle">
+                No cluster required. Every lab is pure Python 3 with zero dependencies —
+                it models the real mechanism so you can read and modify it.
+            </p>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot">1</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Clone the repository</div>
+                        <div class="timeline-desc">The full curriculum, guides and labs.</div>
+                        <div class="cmd-row">
+                            <pre id="cmd-clone"><code>git clone https://github.com/satyabhan007/linux-hpc-security.git
+cd linux-hpc-security</code></pre>
+                            <button class="copy-btn" data-target="#cmd-clone" type="button">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">2</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Run the whole lab suite</div>
+                        <div class="timeline-desc">All 36 labs, ~10s, no dependencies. This is what CI runs on every push.</div>
+                        <div class="cmd-row">
+                            <pre id="cmd-test"><code>python3 run_all.py</code></pre>
+                            <button class="copy-btn" data-target="#cmd-test" type="button">Copy</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">3</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Walk any module</div>
+                        <div class="timeline-desc">Read the guide, then run the three steps in order.</div>
+                        <div class="cmd-row">
+                            <pre id="cmd-walk"><code>python3 benchmarking/step1_hpl_problem_size.py
+python3 hpc/step1_slurm_backfill.py
+python3 ebpf/step3_latency_hist.py</code></pre>
+                            <button class="copy-btn" data-target="#cmd-walk" type="button">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align:center;margin-top:32px;">
+                <a href="https://github.com/satyabhan007/linux-hpc-security" class="btn btn-primary" target="_blank" rel="noopener"><span>↓</span> Clone on GitHub</a>
+                <a href="#docs" class="btn btn-outline">Read the Guides</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer reveal">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="brand-logo">🐧</div>
+                    <div class="brand-text">linux-hpc-security</div>
+                </div>
+                <p class="footer-text">
+                    A self-contained, zero-dependency curriculum for Linux, HPC and
+                    security engineering — every mechanism modelled in code you can
+                    read, every guide grounded in production. Built by Satyabhan.
+                </p>
+                <div class="social-links">
+                    <a href="https://satyabhan007.github.io" class="social-link" target="_blank" rel="noopener"><span>🌐</span> satyabhan007.github.io</a>
+                    <a href="https://github.com/satyabhan007/linux-hpc-security" class="social-link" target="_blank" rel="noopener"><span>💻</span> GitHub</a>
+                    <a href="https://www.linkedin.com/in/satyabhan-bhadoriya-777b28239" class="social-link" target="_blank" rel="noopener"><span>💼</span> LinkedIn</a>
+                </div>
+            </div>
+            <div class="copyright"><span>© <span id="current-year">2026</span> linux-hpc-security. MIT License.</span></div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
