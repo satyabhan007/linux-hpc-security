@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run the full lab suite (all 48 steps, zero deps)
+      - name: Run the full lab suite (all 63 steps, zero deps)
         run: python3 run_all.py
 
   per-module:
@@ -43,6 +43,11 @@ jobs:
           - encrypted-anomaly
           - fraud-detection
           - key-management
+          - soc
+          - noc
+          - splunk
+          - chaos
+          - redblue
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -61,7 +66,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Byte-compile every lab
-        run: python3 -m compileall -q linux hardening stigs benchmarking ebpf ansible warewulf hpc fabric storage containers tuning linux-security encrypted-anomaly fraud-detection key-management run_all.py
+        run: python3 -m compileall -q linux hardening stigs benchmarking ebpf ansible warewulf hpc fabric storage containers tuning linux-security encrypted-anomaly fraud-detection key-management soc noc splunk chaos redblue run_all.py
       - name: shellcheck example scripts
         run: |
           sudo apt-get update -qq && sudo apt-get install -y shellcheck

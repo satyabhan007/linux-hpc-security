@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>linux-hpc-security — Systems Engineering from the Metal Up</title>
-    <meta name="description" content="A from-scratch, zero-black-box curriculum for Linux internals & security, DISA STIGs, HPC benchmarking, eBPF, Ansible, Warewulf, RDMA fabric, parallel storage, containers, kernel tuning, encrypted-traffic anomaly detection, fraud/circumvention detection, and key-management infrastructure. Runnable pure-Python labs, deep guides, interview Q&A.">
+    <meta name="description" content="A from-scratch, zero-black-box curriculum for Linux internals & security, DISA STIGs, HPC benchmarking, eBPF, Ansible, Warewulf, RDMA fabric, parallel storage, containers, kernel tuning, anomaly detection, fraud detection, key management, SOC & detection engineering, NOC & incident command, Splunk/SIEM, chaos engineering, and red/blue/purple teaming. Runnable pure-Python labs, deep guides, interview Q&A.">
     <meta name="color-scheme" content="dark">
     <link rel="canonical" href="https://satyabhan007.github.io/linux-hpc-security/">
     <meta property="og:type" content="website">
@@ -55,18 +55,19 @@
                 A from-scratch, zero-black-box curriculum for the people who keep clusters
                 alive: Linux internals &amp; security, DISA STIGs, HPC benchmarking, eBPF,
                 Ansible, Warewulf, RDMA fabric, parallel storage, containers, kernel tuning,
-                encrypted-traffic anomaly detection, fraud/circumvention detection, and
-                key-management infrastructure — with runnable pure-Python labs that model
-                the real thing.
+                anomaly detection, fraud detection, key management, SOC &amp; detection
+                engineering, NOC &amp; incident command, Splunk/SIEM, chaos engineering, and
+                red/blue/purple teaming — with runnable pure-Python labs that model the
+                real thing.
             </p>
             <div class="hero-actions">
-                <a href="learn/" class="btn btn-primary">Start the 16-Module Course</a>
+                <a href="learn/" class="btn btn-primary">Start the 21-Module Course</a>
                 <a href="#curriculum" class="btn btn-outline">Browse the Modules</a>
             </div>
             <div class="badge-row">
                 <span class="badge badge-green">✅ CI-tested labs</span>
                 <span class="badge badge-primary">🐍 Pure Python 3, zero deps</span>
-                <span class="badge badge-purple">📼 16 modules · 96 lessons</span>
+                <span class="badge badge-purple">📼 21 modules · 126 lessons</span>
             </div>
             <div class="scroll-indicator">
                 <span>Scroll to explore</span>
@@ -79,10 +80,10 @@
     <section class="section-sm reveal">
         <div class="container">
             <div class="stats-bar">
-                <div class="stat-item"><div class="stat-value">16</div><div class="stat-label">Modules</div></div>
-                <div class="stat-item"><div class="stat-value">48</div><div class="stat-label">Runnable Labs</div></div>
-                <div class="stat-item"><div class="stat-value">96</div><div class="stat-label">Course Lessons</div></div>
-                <div class="stat-item"><div class="stat-value">500+</div><div class="stat-label">Interview Q&amp;A</div></div>
+                <div class="stat-item"><div class="stat-value">21</div><div class="stat-label">Modules</div></div>
+                <div class="stat-item"><div class="stat-value">63</div><div class="stat-label">Runnable Labs</div></div>
+                <div class="stat-item"><div class="stat-value">126</div><div class="stat-label">Course Lessons</div></div>
+                <div class="stat-item"><div class="stat-value">800+</div><div class="stat-label">Interview Q&amp;A</div></div>
             </div>
         </div>
     </section>
@@ -90,7 +91,7 @@
     <!-- Curriculum -->
     <section class="section reveal" id="curriculum">
         <div class="container">
-            <h2 class="section-title">Sixteen Modules, One Cluster</h2>
+            <h2 class="section-title">Twenty-One Modules, One Cluster</h2>
             <p class="section-subtitle">
                 Every module follows the same shape: three runnable <code class="inline">stepN_*.py</code>
                 labs that model the real mechanism with no dependencies, a
@@ -102,7 +103,7 @@
             <div class="card" style="margin-bottom:32px;border-left:3px solid #10b981;">
                 <div class="card-title">📘 Prefer a guided path?</div>
                 <p style="margin:12px 0;color:var(--text-muted);font-size:0.92rem;">
-                    The same sixteen topics as a structured course — <strong>16 chapters ×
+                    The same twenty-one topics as a structured course — <strong>21 chapters ×
                     6 levels</strong>, from plain-English analogy to an Ultimate level of
                     real production scenarios, with daily-life examples and checkpoint quizzes.
                 </p>
@@ -400,6 +401,94 @@
                         <a href="key-management/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
                     </div>
                 </div>
+                <!-- 17 -->
+                <div class="card phase-card" data-phase="SecOps">
+                    <div class="phase-number">17</div>
+                    <div class="card-title">SOC Operations &amp; Detection Engineering</div>
+                    <div class="card-meta">triage • ATT&amp;CK coverage • FP tuning • SOAR • MTTD</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        The room that watches. Alert triage and analyst tiers, detection-as
+                        -code and the precision/recall trade, an ATT&amp;CK coverage matrix
+                        weighted by prevalence, and why a noisy rule is worse than no rule.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="soc/step1_detection_precision.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="soc/step2_attack_coverage.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="soc/step3_triage_queue.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="soc/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 18 -->
+                <div class="card phase-card" data-phase="SecOps">
+                    <div class="phase-number">18</div>
+                    <div class="card-title">NOC &amp; Incident Command</div>
+                    <div class="card-meta">golden signals • error budgets • SEV • IC roles • postmortems</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Running it well when it is down. The four golden signals and why you
+                        page on symptoms not causes, multi-window burn-rate alerting,
+                        incident command roles, and the blameless postmortem.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="noc/step1_golden_signals.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="noc/step2_error_budget.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="noc/step3_incident_timeline.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="noc/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 19 -->
+                <div class="card phase-card" data-phase="SecOps">
+                    <div class="phase-number">19</div>
+                    <div class="card-title">Splunk &amp; SIEM</div>
+                    <div class="card-meta">SPL • indexes • stats family • CIM • correlation • RBA</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Logs into answers. SPL as a Unix pipeline for events, indexes and
+                        sourcetypes, the stats/eventstats/streamstats confusion settled,
+                        data models &amp; CIM, and correlation searches with throttling and
+                        risk-based alerting.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="splunk/step1_spl_pipeline.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="splunk/step2_stats_family.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="splunk/step3_correlation_notable.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="splunk/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 20 -->
+                <div class="card phase-card" data-phase="Resilience">
+                    <div class="phase-number">20</div>
+                    <div class="card-title">Chaos Engineering &amp; Resilience</div>
+                    <div class="card-meta">steady-state hypothesis • blast radius • GameDays • circuit breakers</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Breaking things on purpose to find the weaknesses first. The
+                        steady-state hypothesis test, bounding blast radius by error budget,
+                        the staged ramp with an abort button, and the four things that stop
+                        a dependency failure from cascading.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="chaos/step1_steady_state.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="chaos/step2_blast_radius.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="chaos/step3_dependency_failure.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="chaos/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
+                <!-- 21 -->
+                <div class="card phase-card" data-phase="SecOps">
+                    <div class="phase-number">21</div>
+                    <div class="card-title">Red Team / Blue Team / Purple Team</div>
+                    <div class="card-meta">kill chain • ATT&amp;CK • lateral movement • purple loop</div>
+                    <p style="margin:18px 0;color:var(--text-muted);font-size:0.9rem;">
+                        Attack to learn defence. The intrusion lifecycle and why the
+                        detection <em>stage</em> beats the detection count, lateral movement
+                        as shortest-path graph search (BloodHound-style), and the purple
+                        feedback loop that shrinks the gap list.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="redblue/step1_killchain_coverage.py" class="btn btn-sm btn-outline">Step 1</a>
+                        <a href="redblue/step2_lateral_movement.py" class="btn btn-sm btn-outline">Step 2</a>
+                        <a href="redblue/step3_purple_metrics.py" class="btn btn-sm btn-outline">Step 3</a>
+                        <a href="redblue/BEGINNER_GUIDE.md" class="btn btn-sm btn-ghost">Guide</a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -435,6 +524,11 @@
                         <tr><td>Anomaly detection on encrypted activity</td><td><a href="encrypted-anomaly/BEGINNER_GUIDE.md">Guide</a></td><td><a href="encrypted-anomaly/DEEP_DIVE.md">Deep Dive</a></td><td><a href="encrypted-anomaly/INTERVIEW.md">Q&amp;A</a></td></tr>
                         <tr><td>Fraud &amp; circumvention detection</td><td><a href="fraud-detection/BEGINNER_GUIDE.md">Guide</a></td><td><a href="fraud-detection/DEEP_DIVE.md">Deep Dive</a></td><td><a href="fraud-detection/INTERVIEW.md">Q&amp;A</a></td></tr>
                         <tr><td>Key-management infrastructure</td><td><a href="key-management/BEGINNER_GUIDE.md">Guide</a></td><td><a href="key-management/DEEP_DIVE.md">Deep Dive</a></td><td><a href="key-management/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>SOC &amp; detection engineering</td><td><a href="soc/BEGINNER_GUIDE.md">Guide</a></td><td><a href="soc/DEEP_DIVE.md">Deep Dive</a></td><td><a href="soc/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>NOC &amp; incident command</td><td><a href="noc/BEGINNER_GUIDE.md">Guide</a></td><td><a href="noc/DEEP_DIVE.md">Deep Dive</a></td><td><a href="noc/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Splunk &amp; SIEM</td><td><a href="splunk/BEGINNER_GUIDE.md">Guide</a></td><td><a href="splunk/DEEP_DIVE.md">Deep Dive</a></td><td><a href="splunk/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Chaos engineering &amp; resilience</td><td><a href="chaos/BEGINNER_GUIDE.md">Guide</a></td><td><a href="chaos/DEEP_DIVE.md">Deep Dive</a></td><td><a href="chaos/INTERVIEW.md">Q&amp;A</a></td></tr>
+                        <tr><td>Red / blue / purple teaming</td><td><a href="redblue/BEGINNER_GUIDE.md">Guide</a></td><td><a href="redblue/DEEP_DIVE.md">Deep Dive</a></td><td><a href="redblue/INTERVIEW.md">Q&amp;A</a></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -493,7 +587,7 @@ cd linux-hpc-security</code></pre>
                     <div class="timeline-dot">2</div>
                     <div class="timeline-content">
                         <div class="timeline-title">Run the whole lab suite</div>
-                        <div class="timeline-desc">All 48 labs, ~10s, no dependencies. This is what CI runs on every push.</div>
+                        <div class="timeline-desc">All 63 labs, ~12s, no dependencies. This is what CI runs on every push.</div>
                         <div class="cmd-row">
                             <pre id="cmd-test"><code>python3 run_all.py</code></pre>
                             <button class="copy-btn" data-target="#cmd-test" type="button">Copy</button>
