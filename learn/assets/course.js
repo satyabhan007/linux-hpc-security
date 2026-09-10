@@ -10,7 +10,8 @@
     if (!PROG['ch' + n]) PROG['ch' + n] = { lv: 0, quiz: false };
     return PROG['ch' + n];
   }
-  function chPct(n) { var p = chProg(n); return p.quiz ? 100 : Math.round(p.lv / 5 * 80); }
+  function nLevels(n) { var c = CHAPTERS[n - 1]; return c ? c.levels.length : 6; }
+  function chPct(n) { var p = chProg(n); return p.quiz ? 100 : Math.round(p.lv / nLevels(n) * 80); }
   function totalPct() {
     var s = 0;
     for (var i = 0; i < CHAPTERS.length; i++) s += chPct(CHAPTERS[i].num);
@@ -31,7 +32,7 @@
       var p = chProg(c.num);
       if (p.quiz) doneAll++;
       var chips = '';
-      for (var i = 1; i <= 5; i++)
+      for (var i = 1; i <= c.levels.length; i++)
         chips += '<span class="chip' + (p.lv >= i ? ' done' : '') + '">L' + i + '</span>';
       var apps = c.apps.map(function (a) { return '<span class="app-chip">' + a + '</span>'; }).join('');
       var nn = c.num < 10 ? '0' + c.num : '' + c.num;
@@ -50,10 +51,10 @@
     app.innerHTML =
       '<section class="c-hero"><h1>Learn <span>every layer</span> of a Linux HPC cluster</h1>' +
       '<p class="sub">' + CHAPTERS.length + ' modules take you from "what happens when I press power?" to ' +
-      'benchmarking a fabric and keeping an accredited system compliant — each in 5 levels ' +
-      '(Amateur → Expert), with analogies, the tools you already touch, runnable code and a checkpoint quiz.</p>' +
-      '<div class="c-meta"><span><b>' + CHAPTERS.length + '</b> modules</span><span><b>5</b> levels each</span>' +
-      '<span><b>' + (CHAPTERS.length * 5) + '</b> lessons</span><span><b>' + (CHAPTERS.length * 3) + '</b> checkpoint questions</span>' +
+      'benchmarking a fabric and keeping an accredited system compliant — each in 6 levels ' +
+      '(Amateur → Ultimate), with analogies, the tools you already touch, runnable code, real production scenarios and a checkpoint quiz.</p>' +
+      '<div class="c-meta"><span><b>' + CHAPTERS.length + '</b> modules</span><span><b>6</b> levels each</span>' +
+      '<span><b>' + (CHAPTERS.length * 6) + '</b> lessons</span><span><b>' + (CHAPTERS.length * 3) + '</b> checkpoint questions</span>' +
       '<span><b>0</b> prerequisites</span></div></section>' +
       '<div class="prog-wrap"><div class="prog-track"><div class="prog-fill" style="width:' + tot + '%"></div></div>' +
       '<p class="prog-txt">Overall progress: ' + tot + '% · ' + doneAll + '/' + CHAPTERS.length + ' modules completed' +
@@ -65,16 +66,17 @@
   }
 
   /* ---------- CHAPTER VIEW ---------- */
-  var LEVEL_NAMES = ['🐣 Amateur', '🌱 Beginner', '⚙️ Builder', '🎯 Advanced', '🚀 Expert'];
+  var LEVEL_NAMES = ['🐣 Amateur', '🌱 Beginner', '⚙️ Builder', '🎯 Advanced', '🚀 Expert', '🏆 Ultimate'];
 
   function renderChapter(n) {
     var c = CHAPTERS[n - 1];
     if (!c) { location.hash = ''; return; }
     var p = chProg(n);
+    var NL = c.levels.length;
     var maxLv = Math.max(p.lv, 1);
 
     var tabs = '';
-    for (var i = 1; i <= 5; i++) {
+    for (var i = 1; i <= NL; i++) {
       var locked = i > maxLv && i > 1;
       tabs += '<button data-lv="' + i + '" class="' + (i === curLv ? 'active' : '') + '"' + (locked ? ' title="Finish the previous level to unlock"' : '') + '>' +
         LEVEL_NAMES[i - 1] + (p.lv >= i ? ' ✓' : '') + (locked ? ' 🔒' : '') + '</button>';
@@ -87,7 +89,7 @@
     }).join('');
 
     var quizHtml = '';
-    if (curLv === 5) {
+    if (curLv === NL) {
       quizHtml = '<section class="quiz" id="quiz"><h2>🎖️ Checkpoint — ' + c.title + '</h2>' +
         '<p class="sub">Answer all ' + c.quiz.length + ' correctly to complete this module. Explanations appear for every answer.</p>' +
         c.quiz.map(function (q, qi) {
@@ -111,13 +113,13 @@
       '<section class="panel active"><h2>' + LEVEL_NAMES[curLv - 1] + '</h2>' + lv.html +
       (tryLinks ? '<div class="try">' + tryLinks + '</div>' : '') +
       '<div class="lvlnav"><button id="prevLv"' + (curLv === 1 ? ' disabled' : '') + '>← Previous</button>' +
-      '<button id="nextLv"' + (curLv === 5 ? ' disabled' : '') + '>' + (curLv === 4 ? 'Final level →' : 'Next level →') + '</button></div></section>' +
+      '<button id="nextLv"' + (curLv === NL ? ' disabled' : '') + '>' + (curLv === NL - 1 ? 'Final level →' : 'Next level →') + '</button></div></section>' +
       quizHtml +
       '<footer class="c-foot"><div class="links">' + LINKS + '</div></footer>';
 
     document.getElementById('prevLv').onclick = function () { if (curLv > 1) { curLv--; renderChapter(n); } };
     document.getElementById('nextLv').onclick = function () {
-      if (curLv < 5) {
+      if (curLv < NL) {
         if (curLv >= maxLv && curLv + 1 > p.lv) { p.lv = curLv + 1; saveP(PROG); }
         curLv++; renderChapter(n);
       }
@@ -125,7 +127,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('.lvltabs button'), function (b) {
       b.onclick = function () { curLv = +b.getAttribute('data-lv'); renderChapter(n); };
     });
-    if (curLv === 5) wireQuiz(c, p);
+    if (curLv === NL) wireQuiz(c, p);
     window.scrollTo(0, 0);
   }
 
@@ -149,7 +151,7 @@
       var sc = document.querySelector('.quiz .score');
       if (!shownAny) { sc.textContent = 'Pick an answer for each question first.'; sc.className = 'score'; return; }
       if (allOk) {
-        p.quiz = true; p.lv = 5; saveP(PROG);
+        p.quiz = true; p.lv = c.levels.length; saveP(PROG);
         sc.textContent = '🏅 Perfect! Module complete — progress saved.';
         sc.className = 'score all';
       } else {
