@@ -1,0 +1,16 @@
+---
+- name: Render fleet-wide sysctl baseline
+  ansible.builtin.template:
+    src: 99-fleet-baseline.conf.j2
+    dest: /etc/sysctl.d/99-fleet-baseline.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload sysctl
+
+- name: Check for conflicting sysctl.d definitions (dry run)
+  ansible.builtin.command:
+    cmd: sysctl --system --dry-run
+  register: sysctl_dry_run
+  changed_when: false
+  failed_when: sysctl_dry_run.rc != 0
