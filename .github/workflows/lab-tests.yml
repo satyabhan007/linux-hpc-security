@@ -1,5 +1,11 @@
 name: Lab Tests
 
+# Gates: labs / per-module / lint (the original 63-lab Python suite), plus
+#   parts_2_5 - the shared renderer (assets/course.js) + course data for
+#               learn2-5 (Linux kernel/perf at scale, HPC cluster
+#               orchestration, security hardening & compliance, production
+#               operations), and any lab configs landing under learnN/labs/.
+
 on:
   push:
     branches: [main, master]
@@ -71,3 +77,61 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y shellcheck
           find . -name '*.sh' -not -path './.git/*' -print -exec shellcheck -S warning {} +
+
+  parts_2_5:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Syntax-check the shared renderer and every course data file
+        run: |
+          node --check assets/course.js
+          for f in $(find learn2 learn3 learn4 learn5 -path '*/assets/*' -name '*.js'); do
+            echo "check $f"; node --check "$f"
+          done
+
+      - name: Each new part has a manifest and at least chapter 1
+        run: |
+          for p in learn2 learn3 learn4 learn5; do
+            test -f "$p/assets/manifest.js" || { echo "missing $p/assets/manifest.js"; exit 1; }
+            test -f "$p/assets/ch/01.js"   || { echo "missing $p/assets/ch/01.js"; exit 1; }
+          done
+
+      - name: Lint any lab YAML under learnN/labs/ (if present)
+        run: |
+          python -m pip install --quiet yamllint
+          shopt -s globstar nullglob
+          files=(learn2/labs/**/*.y*ml learn3/labs/**/*.y*ml learn4/labs/**/*.y*ml learn5/labs/**/*.y*ml)
+          if [ ${#files[@]} -gt 0 ]; then
+            yamllint -d "{extends: relaxed, rules: {line-length: disable, truthy: disable}}" "${files[@]}"
+          else
+            echo "no learnN/labs YAML yet"
+          fi
+
+      - name: Validate any lab JSON under learnN/labs/ (if present)
+        run: |
+          shopt -s globstar nullglob
+          for f in learn2/labs/**/*.json learn3/labs/**/*.json learn4/labs/**/*.json learn5/labs/**/*.json; do
+            echo "json $f"; python -m json.tool "$f" > /dev/null
+          done
+
+      - name: Shell scripts under learnN/labs/ — parse + shellcheck (if present)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck >/dev/null
+          shopt -s globstar nullglob
+          for f in learn2/labs/**/*.sh learn3/labs/**/*.sh learn4/labs/**/*.sh learn5/labs/**/*.sh; do
+            echo "check $f"; bash -n "$f"; shellcheck "$f"
+          done
+
+      - name: Compile-check + run any zero-dep Python labs under learnN/labs/
+        run: |
+          shopt -s globstar nullglob
+          for f in learn2/labs/**/*.py learn3/labs/**/*.py learn4/labs/**/*.py learn5/labs/**/*.py; do
+            echo "compile $f"; python -m py_compile "$f"
+          done

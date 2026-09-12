@@ -13,7 +13,7 @@
 > model the real mechanism.
 
 **Three ways in:**
-- 🌐 **[The Systems Engineering Course](https://satyabhan007.github.io/linux-hpc-security/learn/)** — 21 modules × 6 levels (analogy → ultimate), with real production scenarios and checkpoint quizzes.
+- 🌐 **[The Systems Engineering Course](https://satyabhan007.github.io/linux-hpc-security/learn/)** — Part 1: 21 modules × 6 levels (analogy → ultimate), with real production scenarios and checkpoint quizzes. Parts 2–5 go deeper at production scale: [Kernel Internals & Performance](https://satyabhan007.github.io/linux-hpc-security/learn2/), [HPC Cluster Orchestration](https://satyabhan007.github.io/linux-hpc-security/learn3/), [Security Hardening & Compliance](https://satyabhan007.github.io/linux-hpc-security/learn4/), [Production Systems Operations](https://satyabhan007.github.io/linux-hpc-security/learn5/) — each 16 chapters × 5 levels.
 - 🧪 **The labs** — 63 standalone `stepN_*.py` files, zero dependencies, CI-tested.
 - 📂 **The guides** — every module has a `BEGINNER_GUIDE`, a `DEEP_DIVE` (production war-stories + real configs) and an `INTERVIEW` file (micro-detail Q&A).
 
@@ -45,10 +45,22 @@ linux-hpc-security/
 ├── chaos/         # 20 · Chaos engineering & resilience (steady-state, blast radius, circuit breakers)
 ├── redblue/       # 21 · Red / blue / purple teaming (kill chain, lateral movement, purple loop)
 │
-├── learn/         # The 21-module × 6-level course (static site)
+├── learn/         # Part 1 — the 21-module × 6-level course (static site)
+├── learn2/        # Part 2 — Linux Kernel Internals & Performance Engineering at Scale (16 ch × 5 levels)
+├── learn3/        # Part 3 — HPC Cluster Orchestration at Scale (16 ch × 5 levels)
+├── learn4/        # Part 4 — Security Hardening & Compliance Engineering at Scale (16 ch × 5 levels)
+├── learn5/        # Part 5 — Production Systems Operations: Observability, Chaos & Incident Response (16 ch × 5 levels)
 ├── run_all.py     # Runs all 63 labs — this is what CI runs
-└── assets/        # Site CSS/JS
+└── assets/        # Site CSS/JS (root) — learn2-5 share assets/course.js + course.css; learn/ keeps its own
 ```
+
+| Path | Contents |
+|---|---|
+| `learn/` | Part 1 — the 21-module × 6-level interactive course (analogy → ultimate), progress saved in `localStorage`. |
+| `learn2/` | Part 2 — Linux Kernel Internals & Performance Engineering at Scale: 16 chapters × 5 levels (scheduler, NUMA, cgroups v2, perf/eBPF, kernel bypass, live-patching, fleet sysctl). |
+| `learn3/` | Part 3 — HPC Cluster Orchestration at Scale: 16 chapters × 5 levels (Slurm internals, Warewulf, MPI placement, RDMA fabric, parallel filesystems, GPU scheduling). |
+| `learn4/` | Part 4 — Security Hardening & Compliance Engineering at Scale: 16 chapters × 5 levels (STIG/CIS automation, SELinux, kernel hardening, supply-chain security, PAM, OpenSCAP). |
+| `learn5/` | Part 5 — Production Systems Operations: 16 chapters × 5 levels (fleet observability, centralized logging, anomaly detection, chaos engineering, on-call, postmortems). |
 
 Every module has the same shape:
 
@@ -114,8 +126,10 @@ render Warewulf overlay templates, and so on, in a few dozen readable lines.
 ## 🎓 Provenance
 
 Built as a companion to [`satyabhan007/AI-ML`](https://github.com/satyabhan007/AI-ML)
-(the same "from scratch, zero black box" approach, applied to AI engineering).
-This repo is the systems half: what the AI stack actually runs on.
+(the same "from scratch, zero black box" approach, applied to AI engineering)
+and [`satyabhan007/DevOps-Infra`](https://github.com/satyabhan007/DevOps-Infra)
+(the same approach applied to cloud infrastructure). This repo is the systems
+half: what the AI and infrastructure stacks actually run on.
 
 ## License
 

@@ -1,0 +1,146 @@
+/* linux-hpc-security Course — shared stylesheet for Parts 2-5 (Part 1 keeps its own copy) */
+:root {
+  --bg: #0b0f19; --surface: #111827; --card: #151c2e; --border: rgba(255,255,255,.08);
+  --text: #f9fafb; --muted: #9ca3af; --dim: #6b7280;
+  --pri: #3b82f6; --vio: #8b5cf6; --cyan: #06b6d4; --green: #10b981; --amber: #f59e0b; --red: #f87171;
+  --grad: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.65; }
+a { color: inherit; text-decoration: none; }
+.wrap { width: min(100% - 32px, 1100px); margin-inline: auto; }
+
+/* header / footer */
+.site { position: sticky; top: 0; z-index: 50; background: rgba(11,15,25,.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); padding: 12px 0; }
+.site .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { font-weight: 800; font-size: 1.1rem; background: linear-gradient(90deg,#fff,#93c5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.nav { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.nav a { color: var(--muted); font-size: .9rem; transition: color .2s; }
+.nav a:hover { color: var(--text); }
+.foot { border-top: 1px solid var(--border); margin-top: 56px; padding: 28px 0 40px; text-align: center; color: var(--dim); font-size: .85rem; }
+.foot a { color: var(--cyan); margin: 0 8px; }
+.foot a:hover { text-decoration: underline; }
+
+/* c-hero / meta (chapter top banner) */
+.c-hero { text-align: center; padding: 44px 0 22px; }
+.c-hero h1 { font-size: clamp(1.9rem, 4.5vw, 2.7rem); background: linear-gradient(90deg,#fff,#93c5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.c-hero .sub { color: var(--muted); max-width: 680px; margin: 10px auto 0; font-size: 1.02rem; }
+.c-meta { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 16px; }
+.c-meta span { background: var(--card); border: 1px solid var(--border); border-radius: 99px; padding: 6px 14px; font-size: .82rem; color: var(--muted); }
+.c-meta b { color: var(--cyan); }
+.c-head { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; }
+.c-head .emoji { font-size: 1.5rem; }
+.c-head .tag { display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--cyan); background: rgba(6,182,212,.12); border: 1px solid rgba(6,182,212,.3); padding: 3px 10px; border-radius: 99px; margin-bottom: 8px; }
+.c-head h1 { font-size: 1.55rem; margin: 0 0 4px; }
+.c-head .t { color: var(--muted); font-size: .92rem; margin-bottom: 10px; }
+.c-head .app-row { display: flex; flex-wrap: wrap; gap: 6px; }
+/* chapter body */
+.c-body { margin-top: 6px; }
+.lvltabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0 14px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
+.lvltabs button { flex: 1 1 auto; background: transparent; border: none; color: var(--muted); font-size: .84rem; font-weight: 600; padding: 6px 10px; border-radius: 8px; cursor: pointer; transition: all .18s; }
+.lvltabs button.active { background: rgba(59,130,246,.18); color: var(--text); }
+.lvltabs button:hover { color: var(--text); }
+.panel { margin-top: 8px; }
+.panel h2 { font-size: 1.15rem; color: var(--cyan); margin-bottom: 10px; }
+.panel .analogy { background: rgba(245,158,11,.08); border-left: 3px solid var(--amber); border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+.panel .analogy .lbl { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--amber); margin-bottom: 4px; }
+.panel .reallife { background: rgba(6,182,212,.07); border-left: 3px solid var(--cyan); border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+.panel .reallife .lbl { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--cyan); margin-bottom: 4px; }
+.panel p { margin: 6px 0; color: var(--muted); }
+.panel b, .panel strong { color: var(--text); }
+.panel code { background: rgba(255,255,255,.06); padding: 1px 6px; border-radius: 4px; font-size: .85rem; color: var(--cyan); }
+.panel pre { background: #0a0e16; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin: 10px 0; font-size: .82rem; color: #c9d1d9; line-height: 1.5; }
+.panel pre code { background: none; padding: 0; color: inherit; }
+.panel .try { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+.panel .try a { display: inline-flex; align-items: center; gap: 6px; background: rgba(59,130,246,.12); border: 1px solid rgba(59,130,246,.3); color: var(--cyan); padding: 8px 14px; border-radius: 9px; font-size: .82rem; font-weight: 600; transition: all .18s; }
+.panel .try a:hover { background: rgba(59,130,246,.22); color: #fff; }
+.lvlnav { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+.lvlnav button { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 9px 16px; border-radius: 9px; font-size: .84rem; font-weight: 600; cursor: pointer; transition: all .18s; }
+.lvlnav button:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+.lvlnav button:disabled { opacity: .35; cursor: default; }
+
+/* quiz */
+.quiz { margin-top: 22px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+.quiz h3 { font-size: 1.05rem; margin-bottom: 12px; }
+.qq { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin: 10px 0; background: rgba(255,255,255,.02); }
+.qq .q { font-size: .92rem; color: var(--text); margin-bottom: 8px; font-weight: 600; }
+.qq label { display: block; padding: 5px 8px; border-radius: 6px; margin: 3px 0; cursor: pointer; font-size: .86rem; color: var(--muted); transition: all .15s; }
+.qq label:hover { background: rgba(255,255,255,.05); }
+.qq input:checked + label { background: rgba(59,130,246,.16); color: var(--text); font-weight: 600; }
+.qq .why { margin-top: 8px; font-size: .82rem; padding: 6px 10px; border-radius: 6px; display: none; }
+.qq .why.ok { display: block; background: rgba(16,185,129,.12); color: var(--green); }
+.qq .why.bad { display: block; background: rgba(248,113,113,.12); color: var(--red); }
+.quiz .score { margin-top: 12px; font-size: .92rem; color: var(--green); font-weight: 700; }
+.quiz .score.all { color: var(--amber); }
+.quiz .hint { font-size: .78rem; color: var(--dim); margin-top: 6px; }
+
+/* crumbs */
+.crumb { font-size: .78rem; color: var(--muted); margin: 0 0 10px; }
+.crumb a { color: var(--cyan); }
+.prog-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; margin: 18px 0; }
+.prog-track { height: 8px; background: #1e2638; border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--grad); transition: width .5s ease; }
+.prog-txt { color: var(--muted); font-size: .85rem; margin-top: 8px; }
+.chgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 10px 0 6px; }
+@media (max-width: 760px) { .chgrid { grid-template-columns: 1fr; } }
+.chcard { display: block; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; transition: transform .18s ease, border-color .18s ease; text-decoration: none; color: inherit; }
+.chcard:hover { transform: translateY(-3px); border-color: rgba(59,130,246,.5); }
+.chcard .done-badge { position: absolute; top: 14px; right: 14px; font-size: 1.1rem; }
+.chcard .emoji { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+.chcard .tag { display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--cyan); background: rgba(6,182,212,.12); border: 1px solid rgba(6,182,212,.3); padding: 3px 10px; border-radius: 99px; margin-bottom: 8px; }
+.chcard h3 { font-size: 1.1rem; margin: 0 0 4px; }
+.chcard .t { color: var(--muted); font-size: .86rem; min-height: 2.4em; margin-bottom: 10px; }
+.chcard .apps { margin-bottom: 10px; }
+.chcard .lvlchips { display: flex; gap: 4px; flex-wrap: wrap; }
+.chip { display: inline-block; width: 24px; height: 22px; line-height: 22px; text-align: center; font-size: .66rem; font-weight: 700; color: var(--muted); background: #1e2638; border: 1px solid var(--border); border-radius: 6px; }
+.chip.done { background: rgba(16,185,129,.18); color: var(--green); border-color: rgba(16,185,129,.4); }
+.chcard { position: relative; }
+.chcard .open { display: block; font-size: .82rem; color: var(--cyan); margin-top: 8px; }
+
+/* ============================================================
+   Parts 2-5 additions — shared renderer (/assets/course.js)
+   ============================================================ */
+
+/* production-depth callout — used at Level 2 of every new-part chapter */
+.panel .standard { background: rgba(139,92,246,.09); border-left: 3px solid var(--vio); border-radius: 8px; padding: 12px 14px; margin: 12px 0; }
+.panel .standard .lbl { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #c4b5fd; margin-bottom: 4px; }
+
+/* chapter header (existing Part 1 leaves .ch-head unstyled; give it the card look) */
+.ch-head { display: flex; gap: 14px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 4px; }
+.ch-head .emoji { font-size: 1.6rem; line-height: 1; }
+.ch-head h1 { font-size: 1.5rem; margin: 4px 0; }
+.ch-head .t { color: var(--muted); font-size: .92rem; margin-bottom: 10px; }
+.ch-head .app-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.app-chip { display: inline-block; font-size: .72rem; color: var(--muted); background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 99px; padding: 3px 10px; }
+
+/* hub: production-depth note + resume button */
+.foot-note { max-width: 720px; margin: 14px auto 0; padding: 10px 16px; font-size: .86rem; color: var(--muted); background: rgba(139,92,246,.07); border: 1px solid rgba(139,92,246,.25); border-radius: 10px; text-align: center; }
+.foot-note b { color: #c4b5fd; }
+.hub-resume { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; background: var(--grad); color: #fff; font-weight: 700; font-size: .9rem; padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; }
+.hub-resume:hover { filter: brightness(1.08); }
+
+/* "Recommended next" card — keeps the learner moving */
+.nextcard { display: block; margin: 22px 0 6px; background: linear-gradient(135deg, rgba(59,130,246,.12), rgba(139,92,246,.12)); border: 1px solid rgba(139,92,246,.3); border-radius: 14px; padding: 16px 18px; color: inherit; transition: border-color .18s ease, transform .18s ease; }
+.nextcard:hover { border-color: rgba(139,92,246,.6); transform: translateY(-2px); }
+.nextcard .kick { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--vio); margin-bottom: 4px; }
+.nextcard .nt { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+.nextcard .nd { display: block; color: var(--muted); font-size: .86rem; margin-top: 3px; }
+
+/* prev / next chapter strip */
+.chapnav { display: flex; justify-content: space-between; gap: 10px; margin: 16px 0 4px; }
+.chapnav a, .chapnav span { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: .82rem; color: var(--muted); }
+.chapnav a:hover { border-color: var(--cyan); color: var(--cyan); }
+.chapnav .nx { text-align: right; }
+.chapnav .disabled { opacity: .35; }
+
+/* lazy-load placeholder */
+.ch-loading { text-align: center; color: var(--muted); padding: 60px 0; font-size: .92rem; }
+.ch-loading::before { content: "⏳"; display: block; font-size: 1.6rem; margin-bottom: 8px; }
+.ch-error { text-align: center; color: var(--red); padding: 60px 0; }
+
+/* full-path strip (hub) */
+.pathstrip { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 16px 0 0; }
+.pathstrip a, .pathstrip span { font-size: .74rem; padding: 4px 9px; border-radius: 99px; border: 1px solid var(--border); color: var(--muted); background: var(--card); }
+.pathstrip .cur { color: var(--text); border-color: var(--vio); background: rgba(139,92,246,.15); font-weight: 700; }
+.pathstrip a:hover { color: var(--text); border-color: var(--cyan); }
