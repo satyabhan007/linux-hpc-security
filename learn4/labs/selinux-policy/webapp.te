@@ -1,0 +1,49 @@
+policy_module(webapp, 1.0.0)
+
+########################################
+#
+# Declarations — a confined domain for an illustrative web application.
+# SELinux is default-deny: only what is explicitly allowed below is
+# permitted, everything else the process attempts is denied.
+#
+
+type webapp_t;
+type webapp_exec_t;
+domain_type(webapp_t)
+domain_entry_file(webapp_t, webapp_exec_t)
+
+type webapp_content_t;
+files_type(webapp_content_t)
+
+type webapp_log_t;
+logging_log_file(webapp_log_t)
+
+type webapp_port_t;
+corenet_port(webapp_port_t)
+
+########################################
+#
+# webapp_t local policy — the minimum set of permissions this
+# application actually needs, and nothing more.
+#
+
+# Allow the confined domain to run its own binary.
+allow webapp_t webapp_exec_t:file entrypoint;
+
+# Read (but not write) its own static content.
+allow webapp_t webapp_content_t:dir list_dir_perms;
+allow webapp_t webapp_content_t:file read_file_perms;
+
+# Write only to its own log directory — no access to any other log path.
+allow webapp_t webapp_log_t:dir rw_dir_perms;
+allow webapp_t webapp_log_t:file create_file_perms;
+
+# Bind only to its own declared port, not an arbitrary network port.
+allow webapp_t webapp_port_t:tcp_socket name_bind;
+corenet_tcp_bind_generic_node(webapp_t)
+
+# Standard boilerplate every confined domain needs for basic process
+# bookkeeping (reading its own /proc entry, using its own file descriptors).
+allow webapp_t self:process { getattr signal_perms };
+allow webapp_t self:fd use;
+allow webapp_t self:tcp_socket create_stream_socket_perms;

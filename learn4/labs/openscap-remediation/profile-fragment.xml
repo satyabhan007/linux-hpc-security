@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Illustrative XCCDF fragment (NOT full SCAP Security Guide content).
+  Shows the shape of two real STIG-style rules so the generated Ansible
+  playbook in remediate.yml can be read alongside the checks it implements.
+  Real content ships in the scap-security-guide package as ssg-<os>-ds.xml.
+-->
+<Benchmark xmlns="http://checklists.nist.gov/xccdf/1.2"
+           id="xccdf_org.example.content_benchmark_LAB">
+  <status>draft</status>
+  <title>Lab illustrative benchmark fragment</title>
+  <description>
+    A two-rule fragment illustrating STIG-style XCCDF structure for the
+    OpenSCAP remediation lab. Not for real compliance scanning.
+  </description>
+
+  <Group id="xccdf_org.example.content_group_ssh">
+    <title>SSH hardening</title>
+
+    <Rule id="xccdf_org.example.content_rule_sshd_disable_root_login"
+          severity="high">
+      <title>Disable SSH root login</title>
+      <description>
+        The root user must not be permitted to log in directly over SSH.
+        Administrators should authenticate as themselves and use sudo.
+      </description>
+      <reference href="https://public.cyber.mil/stigs/">DISA STIG</reference>
+      <fixtext>Set "PermitRootLogin no" in /etc/ssh/sshd_config.</fixtext>
+    </Rule>
+  </Group>
+
+  <Group id="xccdf_org.example.content_group_pwquality">
+    <title>Password quality</title>
+
+    <Rule id="xccdf_org.example.content_rule_accounts_password_minlen"
+          severity="medium">
+      <title>Enforce a minimum password length of 15 characters</title>
+      <description>
+        Password-based authentication must require a minimum length to
+        resist offline brute-force attacks.
+      </description>
+      <reference href="https://public.cyber.mil/stigs/">DISA STIG</reference>
+      <fixtext>Set "minlen = 15" in /etc/security/pwquality.conf.</fixtext>
+    </Rule>
+  </Group>
+</Benchmark>
