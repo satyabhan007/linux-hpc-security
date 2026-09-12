@@ -1,0 +1,51 @@
+# Standalone burn-rate alert example referenced by TEMPLATE.md's Impact
+# section and the postmortem timeline example. This is intentionally the
+# same rule family as ../observability/alerts.rules.yml — duplicated here,
+# annotated for postmortem use, so a postmortem author can cite the exact
+# rule that should have paged without cross-referencing another lab dir.
+#
+# Matches learn5 Ch 7 (SLOs & error budgets) and Ch 8 (alerting design).
+
+groups:
+  - name: postmortem-reference-burn-rate
+    rules:
+      # Fast-burn window: would exhaust a 30-day, 99.9% SLO's error budget
+      # in well under a day at the current rate. This is the rule a
+      # postmortem timeline should point to when asking "did the alerting
+      # layer catch this as fast as it should have."
+      - alert: ErrorBudgetFastBurn
+        expr: >-
+          (1 - avg_over_time(up{job="node"}[1h])) / (1 - 0.999) > 14.4
+          and
+          (1 - avg_over_time(up{job="node"}[5m])) / (1 - 0.999) > 14.4
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: "Fleet availability SLO burning fast (1h+5m window)"
+          postmortem_note: >-
+            If this rule fired, cite its fire time in the postmortem
+            timeline as the moment the alerting layer detected the
+            incident. If it did NOT fire but should have, that gap is
+            itself a root-cause candidate worth a "why" in the 5-whys
+            chain (see TEMPLATE.md).
+
+      # Slow-burn window: a sustained, moderate degradation. Useful in a
+      # postmortem for incidents that were NOT sudden outages but a slow
+      # erosion of the error budget over hours or days.
+      - alert: ErrorBudgetSlowBurn
+        expr: >-
+          (1 - avg_over_time(up{job="node"}[6h])) / (1 - 0.999) > 6
+          and
+          (1 - avg_over_time(up{job="node"}[30m])) / (1 - 0.999) > 6
+        for: 15m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "Fleet availability SLO burning steadily (6h+30m window)"
+          postmortem_note: >-
+            A slow-burn incident's postmortem should explain why it took
+            as long as it did to become visible — often the answer is
+            "nobody reviewed the ticket-severity alert queue," which is
+            itself a valid action item (see learn5 Ch 8's alert-fatigue
+            audit).
