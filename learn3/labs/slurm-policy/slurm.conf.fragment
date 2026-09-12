@@ -1,0 +1,52 @@
+# Part 3 lab — Slurm partition / QOS / fairshare policy fragment
+#
+# This is a FRAGMENT, meant to be appended into a real slurm.conf that
+# already defines ClusterName, SlurmctldHost, SlurmUser, AuthType, and the
+# other cluster-identity/security directives covered elsewhere in this
+# course. It intentionally contains only the partition, node, priority,
+# backfill, and preemption directives this lab is teaching (Chapters 1
+# and 8).
+#
+# ---------------------------------------------------------------------
+# Priority / fairshare (Chapter 1, Chapter 11)
+# ---------------------------------------------------------------------
+PriorityType=priority/multifactor
+PriorityDecayHalfLife=14-0            # 14-day half-life: a policy choice,
+                                       # not a technical default (Ch11)
+PriorityWeightFairshare=100000
+PriorityWeightAge=10000
+PriorityWeightJobSize=5000
+PriorityWeightQOS=20000
+PriorityFavorSmall=NO
+
+# ---------------------------------------------------------------------
+# Scheduler / backfill (Chapter 8)
+# ---------------------------------------------------------------------
+SchedulerType=sched/backfill
+SchedulerParameters=bf_window=1440,bf_resolution=600,bf_max_job_test=1000,bf_continue
+
+# ---------------------------------------------------------------------
+# Preemption (Chapter 8)
+# ---------------------------------------------------------------------
+PreemptType=preempt/qos
+PreemptMode=REQUEUE
+PreemptExemptTime=00:05:00
+
+# ---------------------------------------------------------------------
+# Nodes — two classes: CPU-only "compute" nodes and GPU nodes with GRES
+# (Chapter 6). Real clusters use NodeName ranges; kept small here.
+# ---------------------------------------------------------------------
+NodeName=cpu[001-100]  CPUs=64  RealMemory=256000 State=UNKNOWN
+NodeName=gpu[001-016]  CPUs=64  RealMemory=512000 Gres=gpu:a100:8 State=UNKNOWN
+
+# ---------------------------------------------------------------------
+# Partitions (Chapter 1) — cpu/gpu production queues, plus a short
+# "debug" partition that overlaps both node sets so small interactive
+# jobs are never stuck behind a queue full of multi-day production runs.
+# ---------------------------------------------------------------------
+PartitionName=cpu    Nodes=cpu[001-100] Default=YES MaxTime=7-00:00:00 State=UP \
+                      AllowAccounts=physics,chemistry
+PartitionName=gpu    Nodes=gpu[001-016] MaxTime=2-00:00:00 State=UP \
+                      AllowAccounts=physics,chemistry
+PartitionName=debug  Nodes=cpu[001-004],gpu[001-002] MaxTime=00:30:00 \
+                      MaxNodes=4 State=UP Priority=100 AllowAccounts=ALL

@@ -1,0 +1,61 @@
+# Part 3 lab — Warewulf 4 nodes.conf example (Chapter 2)
+#
+# Shows a "bignode" node profile (8x GPU, RDMA-tuned) and three concrete
+# nodes assigned to it. This is the same data `wwctl node add --profile
+# bignode ...` and `wwctl profile set bignode ...` produce; shown directly
+# here for readability. Not a complete cluster nodes.conf (a real one also
+# defines the "default" profile and every other node class).
+
+nodeprofiles:
+  bignode:
+    comment: "8x A100 GPU nodes, RDMA fabric, wide memlock for pinned buffers"
+    container: rocky-9-gpu
+    ipxe template: default
+    init: /sbin/init
+    root: initramfs
+    kernel:
+      args: "quiet crashkernel=no"
+    resources:
+      - name: gpu
+        type: a100
+    tags:
+      gpu_count: "8"
+      memlock_kb: "unlimited"
+      rdma_enabled: "true"
+
+nodes:
+  bignode01:
+    profiles:
+      - bignode
+    network devices:
+      default:
+        device: eth0
+        hwaddr: aa:bb:cc:dd:ee:01
+        ipaddr: 10.1.0.101
+        netmask: 255.255.255.0
+    tags:
+      rack: "R1"
+
+  bignode02:
+    profiles:
+      - bignode
+    network devices:
+      default:
+        device: eth0
+        hwaddr: aa:bb:cc:dd:ee:02
+        ipaddr: 10.1.0.102
+        netmask: 255.255.255.0
+    tags:
+      rack: "R1"
+
+  bignode03:
+    profiles:
+      - bignode
+    network devices:
+      default:
+        device: eth0
+        hwaddr: aa:bb:cc:dd:ee:03
+        ipaddr: 10.1.0.103
+        netmask: 255.255.255.0
+    tags:
+      rack: "R2"
