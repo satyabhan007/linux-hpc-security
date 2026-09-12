@@ -1,0 +1,21 @@
+{
+  "_comment": "Kafka topic config for the durable buffer between forwarders and Splunk indexers described in learn5 Ch 3 (log pipeline architecture). retention.ms is set to survive a multi-hour indexer outage without dropping events (Ch 3 Scenario B).",
+  "topic": "infra-logs",
+  "partitions": 12,
+  "replication_factor": 3,
+  "config": {
+    "retention.ms": "86400000",
+    "retention.bytes": "-1",
+    "cleanup.policy": "delete",
+    "compression.type": "lz4",
+    "min.insync.replicas": "2",
+    "max.message.bytes": "1048576"
+  },
+  "consumer_groups": [
+    {
+      "name": "splunk-indexer-consumers",
+      "lag_alert_threshold_messages": 500000,
+      "_note": "Consumer lag monitoring is the fix for the Ch 3 anti-pattern 'no monitoring of buffer lag' — a growing lag here means the buffer is silently falling behind the indexer, well before its 24h retention window would actually lose data."
+    }
+  ]
+}

@@ -3,11 +3,26 @@
 > Standard tools, at production depth. Every file here is validated in CI
 > (`.github/workflows/lab-tests.yml`).
 
-Landing alongside chapters 2–16: a node_exporter + Prometheus + Grafana
-dashboard stack config, a Splunk/ELK log-pipeline example with a retention
-policy, a rolling-baseline anomaly detector for infra telemetry (matching
-this repo's `encrypted-anomaly`/`fraud-detection` labs), a chaos-engineering
-experiment definition for a bare-metal node/fabric-link failure, and a
-blameless-postmortem template with a burn-rate alert example.
+Five subdirectories, each mapped to specific chapters in `../assets/ch/`:
 
-Until then, this directory is intentionally a placeholder so links resolve.
+- **[`observability/`](observability/)** — a node_exporter + Prometheus
+  scrape config for a bare-metal/HPC fleet, plus PromQL alerting rules
+  (staleness, rolling-baseline drift, multi-window SLO burn-rate). Ch 1,
+  5, 7, 9, 12, 15.
+- **[`log-pipeline/`](log-pipeline/)** — a Splunk-style ingestion/indexing
+  config (`indexes.conf`, `props.conf`, `inputs.conf`) with per-index
+  retention tiering, plus a Kafka buffer topic config. Ch 2, 3.
+- **[`anomaly-detection/`](anomaly-detection/)** — a zero-dependency
+  Python rolling-baseline anomaly detector (z-score + trend/drift
+  detection), matching this repo's `encrypted-anomaly`/`fraud-detection`
+  labs. Ch 5, 12.
+- **[`chaos-engineering/`](chaos-engineering/)** — two chaos-experiment
+  definitions (an OSS node failure, an InfiniBand fabric-link failure)
+  with steady-state hypotheses, bounded blast radius, and rollback
+  probes. Ch 9, 15.
+- **[`postmortem/`](postmortem/)** — a blameless-postmortem template and
+  a burn-rate alert example for citing in a postmortem timeline. Ch 7, 8,
+  14, 16.
+
+Each subdirectory has its own README with a "try it" section showing how
+to validate/run that lab's files locally.
