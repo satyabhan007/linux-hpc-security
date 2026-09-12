@@ -1,0 +1,16 @@
+[Unit]
+Description=Batch analytics jobs — resource-capped cgroups v2 slice
+Before=slices.target
+
+[Slice]
+# Companion to Ch4 (cgroups v2 & resource control at scale).
+# 2 CPUs worth of quota, low scheduling weight relative to other slices,
+# a soft memory ceiling below the hard cap (see Ch4's memory.high vs
+# memory.max scenario), and a pids cap so a runaway fork loop in one batch
+# job cannot exhaust system-wide PID space.
+CPUQuota=200%
+CPUWeight=20
+MemoryHigh=3800M
+MemoryMax=4096M
+IOWeight=10
+TasksMax=2048

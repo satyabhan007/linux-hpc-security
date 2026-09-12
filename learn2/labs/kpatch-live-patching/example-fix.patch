@@ -1,0 +1,24 @@
+--- a/drivers/example/example_driver.c
++++ b/drivers/example/example_driver.c
+@@ -118,10 +118,14 @@ static int example_ioctl(struct file *filp, unsigned int cmd,
+ 	struct example_dev *dev = filp->private_data;
+ 	int ret = 0;
+
++	if (!dev) {
++		return -ENODEV;
++	}
++
+ 	switch (cmd) {
+ 	case EXAMPLE_IOCTL_RESET:
+-		/* CVE-2026-NNNNN: missing bounds check allows an
+-		 * out-of-bounds read via a crafted ioctl argument. */
+-		ret = example_reset(dev, arg);
++		/* Fixed for CVE-2026-NNNNN: validate the requested reset
++		 * length against the device's actual buffer size before
++		 * touching it, closing the out-of-bounds read. */
++		if (arg > EXAMPLE_MAX_RESET_LEN)
++			return -EINVAL;
++		ret = example_reset(dev, arg);
+ 		break;
+ 	default:
+ 		ret = -ENOTTY;

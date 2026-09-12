@@ -1,0 +1,9 @@
+---
+# playbook.yml — apply the fleet-wide sysctl baseline (Ch13). Run against
+# an inventory group, e.g.:
+#   ansible-playbook -i inventory.ini playbook.yml
+- name: Apply fleet-wide sysctl baseline
+  hosts: all
+  become: true
+  roles:
+    - sysctl_baseline
