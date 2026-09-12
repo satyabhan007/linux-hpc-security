@@ -1,0 +1,66 @@
+/* linux-hpc-security Learn — PART 2 (Linux Kernel Internals & Performance Engineering at Scale).
+ * Hub metadata only; chapter bodies load lazily from assets/ch/NN.js */
+window.PART = {
+  num: 2,
+  kicker: 'Part 2',
+  heroTitle: 'Linux kernel internals &amp; performance engineering at scale',
+  heroSub: '16 chapters on running the Linux kernel the way a platform team operates it across a fleet: scheduler internals, ' +
+    'memory management &amp; NUMA, cgroups v2 resource control, perf/eBPF profiling in production, the block layer &amp; I/O ' +
+    'schedulers, huge pages, kernel-bypass networking, syscall tracing, IRQ/softirq tuning, debugging production kernel panics, ' +
+    'live-patching, fleet-wide sysctl management, and container-vs-VM isolation tradeoffs. Each in 5 levels ending in an ' +
+    '<b>Interview drill</b>.',
+  standardNote: 'Part 1 introduced the kernel\'s major subsystems. This part is about operating them at fleet scale — perf/eBPF ' +
+    'in production, cgroups v2, and sysctl as versioned config — using the standard tooling a kernel/performance team actually runs.',
+  prev: { href: '../learn/', label: 'Part 1 — the systems engineering fundamentals course' },
+  next: { href: '../learn3/', label: 'Part 3 — HPC cluster orchestration at scale' },
+  chapters: [
+    { num: 1, emoji: '🧮', title: 'Process Scheduler Internals: CFS, EEVDF & Runqueues', layer: 'Foundation',
+      tagline: 'Why a "nice" process isn\'t always nice, and how the kernel actually decides who runs next on a 128-core box.',
+      apps: ['diagnosing a runqueue imbalance on a NUMA box', 'CFS vs EEVDF migration on a new kernel', 'the "one core pegged, others idle" ticket'] },
+    { num: 2, emoji: '🧠', title: 'Memory Management Internals: Page Cache, THP & the OOM Killer', layer: 'Foundation',
+      tagline: '`free -h` lies by omission — what the page cache, slab allocator, and OOM killer are actually doing under load.',
+      apps: ['reading /proc/meminfo under memory pressure', 'the "OOM killer took down the wrong process" incident', 'tuning vm.swappiness for a database node'] },
+    { num: 3, emoji: '🗺️', title: 'NUMA Topology & NUMA-Aware Tuning', layer: 'Performance',
+      tagline: 'A "fast" memory access and a "slow" one on the same box — placing processes and memory on the right node.',
+      apps: ['numactl --hardware on a new HPC node', 'pinning a latency-sensitive service with taskset', 'diagnosing cross-node memory access via numastat'] },
+    { num: 4, emoji: '📦', title: 'cgroups v2 & Resource Control at Scale', layer: 'Foundation',
+      tagline: 'The unified hierarchy that makes "this container gets 2 cores and 4GB, no more" actually enforceable.',
+      apps: ['migrating a fleet from cgroups v1 to v2', 'a cpu.max throttling mystery', 'memory.high vs memory.max in a multi-tenant node'] },
+    { num: 5, emoji: '🔥', title: 'perf & eBPF Profiling in Production', layer: 'Observability',
+      tagline: 'Flamegraphs and BCC/bpftrace scripts that answer "why is this box slow" without a reboot or a redeploy.',
+      apps: ['a perf record + flamegraph on a live prod node', 'a bpftrace one-liner for syscall latency', 'profiling a CPU regression after a kernel upgrade'] },
+    { num: 6, emoji: '💽', title: 'I/O Schedulers & the Block Layer', layer: 'Performance',
+      tagline: 'mq-deadline vs bfq vs kyber — and why the wrong scheduler makes an NVMe array behave like a single spinning disk.',
+      apps: ['picking an I/O scheduler for a Lustre OSS', 'diagnosing p99 write latency on an NVMe RAID', 'blk-mq queue-depth tuning'] },
+    { num: 7, emoji: '📖', title: 'Huge Pages & Memory-Mapped Performance', layer: 'Performance',
+      tagline: 'THP vs static hugepages — trading TLB misses for the "compaction stall" nobody wants at 3am.',
+      apps: ['sizing hugepages for a database or DPDK app', 'disabling THP on a latency-sensitive service', 'a TLB-miss-driven performance regression'] },
+    { num: 8, emoji: '🚀', title: 'Kernel Bypass & Userspace Networking', layer: 'Performance',
+      tagline: 'XDP, AF_XDP and io_uring — the DPDK-adjacent techniques that skip the kernel network stack entirely.',
+      apps: ['an XDP drop program for DDoS mitigation', 'evaluating AF_XDP vs DPDK for a packet pipeline', 'io_uring for a high-throughput storage service'] },
+    { num: 9, emoji: '🕵️', title: 'Syscall Tracing & Auditing', layer: 'Observability',
+      tagline: 'strace, ftrace and eBPF tracepoints — three ways to see exactly what a process asked the kernel to do.',
+      apps: ['strace on a hung production process', 'an eBPF tracepoint counting a hot syscall', 'measuring seccomp filter overhead'] },
+    { num: 10, emoji: '⚡', title: 'Interrupt Handling, IRQ Affinity & softirq Tuning', layer: 'Performance',
+      tagline: 'One CPU fielding every NIC interrupt while 63 others sit idle — and how RSS/IRQ affinity fixes it.',
+      apps: ['pinning NIC interrupts away from a hot core', 'diagnosing softirq starvation under a packet storm', 'RPS/RFS tuning on a 100GbE box'] },
+    { num: 11, emoji: '💥', title: 'Debugging Production Kernel Panics & Oopses', layer: 'Operations',
+      tagline: 'kdump, the crash utility, and reading a vmcore — turning a panic into a root cause instead of a mystery reboot.',
+      apps: ['configuring kdump fleet-wide', 'reading a kernel oops backtrace', 'a crash-utility session on a captured vmcore'] },
+    { num: 12, emoji: '🩹', title: 'Live Kernel Patching', layer: 'Operations',
+      tagline: 'Patching a CVE into a running kernel with kpatch/kGraft — no reboot, no maintenance window.',
+      apps: ['rolling out a kpatch module fleet-wide', 'deciding when live-patching is NOT enough', 'verifying a live patch actually applied'] },
+    { num: 13, emoji: '🎛️', title: 'sysctl Tuning at Fleet Scale', layer: 'Operations',
+      tagline: 'One sysctl.conf per snowflake node is a liability — managing kernel parameters as versioned, tested config.',
+      apps: ['a fleet-wide sysctl baseline in config management', 'catching sysctl drift with a CI check', 'rolling back a bad net.core tuning change'] },
+    { num: 14, emoji: '🧱', title: 'Container vs VM Kernel Isolation Tradeoffs', layer: 'Architecture',
+      tagline: 'Namespaces + cgroups vs a hypervisor — and where gVisor/Kata sit on the isolation-vs-overhead spectrum.',
+      apps: ['choosing gVisor for a multi-tenant untrusted workload', 'a kernel CVE that only affects containers, not VMs', 'the container-escape blast-radius conversation'] },
+    { num: 15, emoji: '🚑', title: 'Case Study — Diagnosing a Fleet-Wide Latency Regression', layer: 'Case study',
+      tagline: 'A real "p99 latency doubled after the kernel upgrade" incident, read top to bottom: symptoms, diagnosis, fix.',
+      apps: ['a kernel-upgrade regression bisection', 'reading a perf diff across kernel versions', 'the post-incident writeup'] },
+    { num: 16, emoji: '🗺️', title: 'Reference Architecture — The Kernel Performance Platform', layer: 'Case study',
+      tagline: 'Every piece of this part assembled: scheduler, NUMA, cgroups v2, eBPF observability, fleet sysctl — one diagram.',
+      apps: ['designing your org\'s kernel-tuning platform', 'a performance-engineering RFC', 'the "walk me through your kernel tuning" interview'] }
+  ]
+};

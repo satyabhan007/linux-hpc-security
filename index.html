@@ -35,7 +35,11 @@
             </div>
             <nav class="nav-links">
                 <a href="#curriculum">Curriculum</a>
-                <a href="learn/">Course</a>
+                <a href="learn/">Course · P1</a>
+                <a href="learn2/">P2</a>
+                <a href="learn3/">P3</a>
+                <a href="learn4/">P4</a>
+                <a href="learn5/">P5</a>
                 <a href="#docs">Guides</a>
                 <a href="#interview">Interview Prep</a>
                 <a href="#getting-started">Getting Started</a>
@@ -80,9 +84,9 @@
     <section class="section-sm reveal">
         <div class="container">
             <div class="stats-bar">
+                <div class="stat-item"><div class="stat-value">5</div><div class="stat-label">Course Parts</div></div>
                 <div class="stat-item"><div class="stat-value">21</div><div class="stat-label">Modules</div></div>
                 <div class="stat-item"><div class="stat-value">63</div><div class="stat-label">Runnable Labs</div></div>
-                <div class="stat-item"><div class="stat-value">126</div><div class="stat-label">Course Lessons</div></div>
                 <div class="stat-item"><div class="stat-value">800+</div><div class="stat-label">Interview Q&amp;A</div></div>
             </div>
         </div>
@@ -101,13 +105,32 @@
             </p>
 
             <div class="card" style="margin-bottom:32px;border-left:3px solid #10b981;">
-                <div class="card-title">📘 Prefer a guided path?</div>
+                <div class="card-title">📘 Prefer a guided path? Five parts, deep and wide.</div>
                 <p style="margin:12px 0;color:var(--text-muted);font-size:0.92rem;">
-                    The same twenty-one topics as a structured course — <strong>21 chapters ×
-                    6 levels</strong>, from plain-English analogy to an Ultimate level of
-                    real production scenarios, with daily-life examples and checkpoint quizzes.
+                    <strong>Part 1 — Fundamentals</strong>: the twenty-one topics below as
+                    <strong>21 chapters &times; 6 levels</strong>, from plain-English analogy to
+                    an Ultimate level of real production scenarios.<br>
+                    <strong>Part 2 — Linux Kernel Internals &amp; Performance Engineering</strong>:
+                    <strong>16 chapters &times; 5 levels</strong> on scheduler internals, NUMA,
+                    cgroups v2, perf/eBPF profiling, kernel bypass, live-patching.<br>
+                    <strong>Part 3 — HPC Cluster Orchestration at Scale</strong>: <strong>16
+                    chapters &times; 5 levels</strong> on Slurm internals, Warewulf, MPI
+                    placement, RDMA fabric, parallel filesystems, GPU scheduling.<br>
+                    <strong>Part 4 — Security Hardening &amp; Compliance Engineering</strong>:
+                    <strong>16 chapters &times; 5 levels</strong> on STIG/CIS automation,
+                    SELinux, kernel hardening, supply-chain security, PAM, OpenSCAP.<br>
+                    <strong>Part 5 — Production Systems Operations</strong>: <strong>16
+                    chapters &times; 5 levels</strong> on fleet observability, centralized
+                    logging, anomaly detection, chaos engineering, on-call &amp; postmortems —
+                    each ending in an interview drill.
                 </p>
-                <a href="learn/" class="btn btn-sm btn-primary">Open the Systems Engineering Course →</a>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <a href="learn/" class="btn btn-sm btn-primary">Part 1 — Fundamentals →</a>
+                    <a href="learn2/" class="btn btn-sm btn-outline">Part 2 — Kernel &amp; Perf →</a>
+                    <a href="learn3/" class="btn btn-sm btn-outline">Part 3 — HPC Orchestration →</a>
+                    <a href="learn4/" class="btn btn-sm btn-outline">Part 4 — Security Hardening →</a>
+                    <a href="learn5/" class="btn btn-sm btn-outline">Part 5 — Production Ops →</a>
+                </div>
             </div>
 
             <div class="grid-3">
@@ -535,6 +558,114 @@
         </div>
     </section>
 
+    <!-- Keep Learning -->
+    <section class="section section-alt reveal" id="learn-more">
+        <div class="container">
+            <h2 class="section-title">Keep <span class="highlight">Learning</span></h2>
+            <p class="section-subtitle">
+                Five course parts in this repo — Part 1 from first principles,
+                Parts 2–5 operating the standard tools at production depth.
+            </p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🐧</div>
+                        <div>
+                            <div class="card-title">Course · Part 1 — Fundamentals</div>
+                            <div class="card-meta">This repo · 21 modules &times; 6 levels</div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">
+                        Linux internals &rarr; hardening &amp; STIGs &rarr; HPC benchmarking
+                        &rarr; eBPF &rarr; Ansible &rarr; Warewulf &rarr; Slurm &rarr; fabric
+                        &amp; storage &rarr; containers &amp; tuning &rarr; SOC/NOC &amp;
+                        red/blue teaming.
+                    </p>
+                    <a href="learn/" class="btn btn-sm btn-primary">Open Part 1</a>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🧠</div>
+                        <div>
+                            <div class="card-title">Course · Part 2 — Kernel Internals &amp; Performance</div>
+                            <div class="card-meta">This repo · 16 chapters &times; 5 levels</div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">
+                        Scheduler internals, memory management &amp; NUMA, cgroups v2,
+                        perf/eBPF profiling in production, I/O schedulers, kernel bypass,
+                        live-patching, fleet-wide sysctl tuning.
+                    </p>
+                    <a href="learn2/" class="btn btn-sm btn-primary">Open Part 2</a>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🖥️</div>
+                        <div>
+                            <div class="card-title">Course · Part 3 — HPC Cluster Orchestration</div>
+                            <div class="card-meta">This repo · 16 chapters &times; 5 levels</div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">
+                        Slurm scheduler internals, Warewulf provisioning at scale, MPI
+                        placement &amp; topology awareness, RDMA/InfiniBand fabric design,
+                        parallel filesystems, GPU scheduling, burst-to-cloud HPC.
+                    </p>
+                    <a href="learn3/" class="btn btn-sm btn-primary">Open Part 3</a>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🛡️</div>
+                        <div>
+                            <div class="card-title">Course · Part 4 — Security Hardening &amp; Compliance</div>
+                            <div class="card-meta">This repo · 16 chapters &times; 5 levels</div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">
+                        DISA STIG automation at fleet scale, CIS benchmarks as code,
+                        SELinux/AppArmor policy authoring, kernel hardening, supply-chain
+                        security, secrets management, intrusion detection, OpenSCAP.
+                    </p>
+                    <a href="learn4/" class="btn btn-sm btn-primary">Open Part 4</a>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📡</div>
+                        <div>
+                            <div class="card-title">Course · Part 5 — Production Systems Operations</div>
+                            <div class="card-meta">This repo · 16 chapters &times; 5 levels</div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">
+                        Fleet-wide observability, centralized logging at scale, anomaly
+                        detection, chaos engineering for bare-metal/HPC, on-call &amp;
+                        incident response, capacity planning, postmortems.
+                    </p>
+                    <a href="learn5/" class="btn btn-sm btn-primary">Open Part 5</a>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🤖</div>
+                        <div>
+                            <div class="card-title">AI-ML &amp; DevOps-Infra — sibling curricula</div>
+                            <div class="card-meta">External · satyabhan007.github.io</div>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.9rem;">
+                        AI/ML engineering from scratch through production system design and
+                        enterprise-scale AI, and infrastructure from IaC through Kubernetes
+                        platform engineering and observability — the same "from scratch,
+                        zero black box" approach applied to two other stacks.
+                    </p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <a href="https://satyabhan007.github.io/AI-ML/" class="btn btn-sm btn-outline" target="_blank" rel="noopener">AI-ML &#8599;</a>
+                        <a href="https://satyabhan007.github.io/DevOps-Infra/" class="btn btn-sm btn-outline" target="_blank" rel="noopener">DevOps-Infra &#8599;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Interview -->
     <section class="section reveal" id="interview">
         <div class="container">
@@ -625,8 +756,15 @@ python3 ebpf/step3_latency_hist.py</code></pre>
                 </div>
                 <p class="footer-text">
                     A self-contained, zero-dependency curriculum for Linux, HPC and
-                    security engineering — every mechanism modelled in code you can
-                    read, every guide grounded in production. Built by Satyabhan.
+                    security engineering (Part 1), then the standard tools operated at
+                    production depth (Parts 2–5): kernel/perf engineering, HPC cluster
+                    orchestration, security hardening &amp; compliance, and production
+                    operations. Every mechanism modelled in code you can read. Sibling
+                    project to
+                    <a href="https://satyabhan007.github.io/AI-ML/" style="color:var(--primary)">AI-ML</a>
+                    and
+                    <a href="https://satyabhan007.github.io/DevOps-Infra/" style="color:var(--primary)">DevOps-Infra</a>.
+                    Built by Satyabhan.
                 </p>
                 <div class="social-links">
                     <a href="https://satyabhan007.github.io" class="social-link" target="_blank" rel="noopener"><span>🌐</span> satyabhan007.github.io</a>

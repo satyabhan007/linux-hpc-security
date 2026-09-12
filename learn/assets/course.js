@@ -22,6 +22,10 @@
   var LINKS =
     '<a href="#/">← All modules</a>' +
     '<a href="../">🏠 Main site</a>' +
+    '<a href="../learn2/">🧠 P2</a>' +
+    '<a href="../learn3/">🖥️ P3</a>' +
+    '<a href="../learn4/">🛡️ P4</a>' +
+    '<a href="../learn5/">📡 P5</a>' +
     '<a href="https://github.com/satyabhan007/linux-hpc-security" target="_blank" rel="noopener">💻 GitHub</a>' +
     '<a href="https://www.linkedin.com/in/satyabhan-bhadoriya-777b28239/" target="_blank" rel="noopener">💼 LinkedIn</a>';
 

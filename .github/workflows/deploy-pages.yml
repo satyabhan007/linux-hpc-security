@@ -3,7 +3,8 @@ name: Deploy linux-hpc-security to GitHub Pages
 # Publishes the static site plus the raw lesson sources so in-page links to
 # `<module>/stepN_*.py` and `<module>/*.md` resolve (Pages serves them as
 # plain text / rendered markdown). Package: index.html, 404.html, assets/,
-# learn/, and every module dir. Excludes: __pycache__, .github/.
+# learn/ (Part 1) + learn2-5/ (Parts 2-5, shared /assets/course.js), and
+# every module dir. Excludes: __pycache__, .github/.
 
 on:
   push:
@@ -39,7 +40,7 @@ jobs:
           rm -rf _site_pkg && mkdir -p _site_pkg
           cp index.html 404.html _site_pkg/ 2>/dev/null || true
           cp README.md LICENSE _site_pkg/ 2>/dev/null || true
-          cp -r assets learn _site_pkg/
+          cp -r assets learn learn2 learn3 learn4 learn5 _site_pkg/
           for d in linux hardening stigs benchmarking ebpf ansible warewulf \
                    hpc fabric storage containers tuning \
                    linux-security encrypted-anomaly fraud-detection key-management \

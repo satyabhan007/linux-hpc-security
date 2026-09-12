@@ -1,0 +1,66 @@
+/* linux-hpc-security Learn — PART 5 (Production Systems Operations: Observability, Chaos & Incident Response).
+ * Hub metadata only; chapter bodies load lazily from assets/ch/NN.js */
+window.PART = {
+  num: 5,
+  kicker: 'Part 5',
+  heroTitle: 'Production systems operations: observability, chaos &amp; incident response',
+  heroSub: '16 chapters on running infrastructure the way a production operations team does: fleet-wide observability ' +
+    '(node_exporter/eBPF), centralized logging at scale (Splunk/ELK), log-pipeline architecture, distributed tracing, anomaly ' +
+    'detection for infra telemetry, fraud/circumvention detection pipelines, SLOs &amp; error budgets, alerting design, chaos ' +
+    'engineering for bare-metal/HPC systems, on-call &amp; incident response, runbook automation, capacity planning, SOC/NOC ' +
+    'patterns, and postmortems. Each in 5 levels ending in an <b>Interview drill</b>.',
+  standardNote: 'Part 1 introduced individual tools in isolation. This part is about running them as one operations platform — ' +
+    'metrics, logs, traces, alerting and chaos wired together the way a production SRE/NOC/SOC team actually runs a fleet.',
+  prev: { href: '../learn4/', label: 'Part 4 — security hardening & compliance engineering at scale' },
+  next: null,
+  chapters: [
+    { num: 1, emoji: '📡', title: 'Fleet-Wide Observability: node_exporter & eBPF Metrics', layer: 'Foundation',
+      tagline: 'Every node exporting the same golden signals — node_exporter plus eBPF-sourced metrics that catch what /proc alone misses.',
+      apps: ['rolling out node_exporter with a standard textfile-collector set', 'an eBPF metric catching syscall latency Prometheus otherwise can\'t see', 'a fleet-wide dashboard SLA for metric freshness'] },
+    { num: 2, emoji: '🪵', title: 'Centralized Logging at Scale: Splunk/ELK Patterns', layer: 'Foundation',
+      tagline: 'Every node\'s logs in one searchable place — index design, field extraction, and an ingestion pipeline that doesn\'t fall over at 3am.',
+      apps: ['a Splunk index/sourcetype design for a new module', 'an ELK ingest pipeline for structured audit logs', 'the "logs stopped flowing from rack 12" triage'] },
+    { num: 3, emoji: '🏗️', title: 'Log Pipeline Architecture: Ingestion, Indexing & Retention', layer: 'Foundation',
+      tagline: 'Forwarders, buffering, and a retention policy that keeps 90 days searchable without a storage bill that ends careers.',
+      apps: ['sizing a hot/warm/cold Splunk storage tier', 'a Kafka-buffered log pipeline surviving an indexer outage', 'a retention policy meeting compliance vs. cost'] },
+    { num: 4, emoji: '🧵', title: 'Distributed Tracing for Infrastructure & Batch Pipelines', layer: 'Observability',
+      tagline: 'Tracing a request or a batch job across ten hops when "it\'s slow somewhere" is the entire bug report.',
+      apps: ['instrumenting a multi-stage batch pipeline with OpenTelemetry', 'tracing a cross-service latency spike to one hop', 'a sampling strategy for a high-volume trace pipeline'] },
+    { num: 5, emoji: '🔍', title: 'Anomaly Detection for Infrastructure Telemetry', layer: 'Observability',
+      tagline: 'Catching a slow memory leak or a beaconing pattern in a sea of normal metrics — statistical baselines, not a fixed threshold.',
+      apps: ['a rolling-baseline anomaly detector for node metrics', 'flagging a beaconing pattern in encrypted-traffic flow data', 'tuning sensitivity to cut false-positive alerts'] },
+    { num: 6, emoji: '🕸️', title: 'Fraud & Circumvention Detection Pipelines at Scale', layer: 'Security',
+      tagline: 'Velocity checks and linkage graphs running at fleet scale — the same pattern this repo\'s fraud-detection labs model, in production.',
+      apps: ['a velocity-based fraud-detection pipeline in streaming mode', 'a linkage-graph analysis catching coordinated abuse', 'a cost-based evaluation of a detection model\'s false-positive rate'] },
+    { num: 7, emoji: '🎯', title: 'SLOs & Error Budgets for Infrastructure Teams', layer: 'Governance',
+      tagline: 'An SLO for "the cluster is up" that means something — error budgets that decide when to slow down and harden instead of ship.',
+      apps: ['defining an SLO for a shared HPC/compute service', 'a burn-rate alert catching a budget-eating regression', 'the error-budget conversation that pauses a risky rollout'] },
+    { num: 8, emoji: '🔔', title: 'Alerting Design: Paging, Escalation & Noise Reduction', layer: 'Operations',
+      tagline: 'An alert that pages a human should mean something is broken now — deduplication, escalation policies, and killing alert fatigue.',
+      apps: ['a paging policy tied to burn-rate, not raw thresholds', 'an escalation chain for a follow-the-sun NOC', 'an alert-fatigue audit that cuts noise by 80%'] },
+    { num: 9, emoji: '💥', title: 'Chaos Engineering for Bare-Metal & HPC Systems', layer: 'Operations',
+      tagline: 'Killing a node, a fabric link, or a filesystem on purpose — steady-state hypotheses and blast-radius control for physical infrastructure.',
+      apps: ['a chaos experiment killing an OSS node in a parallel filesystem', 'a fabric-link failure test validating fat-tree redundancy', 'defining blast radius before running a chaos experiment on a shared cluster'] },
+    { num: 10, emoji: '🚨', title: 'On-Call & Incident Response for Infrastructure Teams', layer: 'Operations',
+      tagline: 'A SEV framework, an incident-commander role, and a runbook that works at 3am when the on-call engineer is half awake.',
+      apps: ['designing a SEV1-4 severity framework', 'running an incident with a clear incident-commander role', 'a runbook that survives being read by someone unfamiliar with the system'] },
+    { num: 11, emoji: '🤖', title: 'Runbook Automation & Self-Healing Remediation', layer: 'Operations',
+      tagline: 'Turning "restart the service and page someone" into an automated remediation that runs before a human even wakes up.',
+      apps: ['an automated remediation for a known-flapping service', 'a self-healing script with a hard safety limit before it pages a human', 'auditing what automated remediation actually did during an incident'] },
+    { num: 12, emoji: '📐', title: 'Capacity Planning for Compute Clusters', layer: 'Cost',
+      tagline: 'Forecasting when the cluster runs out of room from real utilization trends, not a gut feeling six months too late.',
+      apps: ['a utilization-trend capacity forecast', 'right-sizing a shared cluster after a usage-pattern shift', 'a capacity-planning review ahead of a budget cycle'] },
+    { num: 13, emoji: '🎧', title: 'SOC/NOC Operational Patterns: Triage, Handoff & Command', layer: 'Operations',
+      tagline: 'How a SOC triages an alert and a NOC runs incident command — the operational patterns that keep both from drowning.',
+      apps: ['a SOC triage queue with ATT&CK-mapped priority', 'a NOC handoff procedure across shifts', 'a joint SOC/NOC bridge during a security-flavored outage'] },
+    { num: 14, emoji: '📝', title: 'Postmortems for Infrastructure Incidents', layer: 'Governance',
+      tagline: 'A blameless postmortem that produces real action items — not a document that gets filed and never read again.',
+      apps: ['facilitating a blameless postmortem meeting', 'writing a postmortem timeline from raw logs and pages', 'tracking postmortem action items to actual closure'] },
+    { num: 15, emoji: '🚨', title: 'Case Study — Anatomy of a Major Multi-System Outage', layer: 'Case study',
+      tagline: 'A real outage that started in one system and cascaded across three others, read top to bottom: detection, response, recovery.',
+      apps: ['a cascading-failure root-cause reconstruction', 'the cross-team incident bridge during a multi-system outage', 'the postmortem that changed the architecture'] },
+    { num: 16, emoji: '🗺️', title: 'Reference Architecture — The Production Operations Platform', layer: 'Case study',
+      tagline: 'Every piece of this part assembled: metrics, logs, tracing, anomaly detection, alerting, chaos, on-call — one diagram.',
+      apps: ['designing your org\'s production-ops platform', 'an observability-platform RFC', 'the "walk me through your on-call setup" interview'] }
+  ]
+};
