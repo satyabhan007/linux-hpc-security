@@ -1,0 +1,74 @@
+# Chaos experiment definition: disable one InfiniBand fabric link and
+# validate fat-tree redundancy actually reroutes traffic.
+#
+# Matches learn5 Ch 9, Scenario B ("A fabric-link failure test validating
+# fat-tree redundancy") — including the exact failure mode described
+# there (a misconfigured routing table sending traffic into a black hole
+# instead of rerouting).
+
+name: fabric-link-failure
+version: "1.0"
+owner: fabric-team
+
+description: >
+  Validate that disabling one InfiniBand link in the fat-tree topology
+  causes traffic to reroute through redundant paths transparently, with
+  no job-visible impact beyond a brief (sub-second) blip.
+
+steady_state_hypothesis:
+  title: "Cross-rack MPI bandwidth stays within 10% of baseline with one link disabled"
+  probes:
+    - name: baseline-fabric-bandwidth
+      type: metric
+      query: 'sum(rate(infiniband_port_xmit_data_bytes_total[1m]))'
+      source: ../observability/prometheus.yml
+      tolerance:
+        min_ratio_of_baseline: 0.90
+    - name: no-blackholed-traffic
+      type: metric
+      query: 'sum(rate(infiniband_port_xmit_discards_total[1m]))'
+      tolerance:
+        max: 0
+
+blast_radius:
+  scope: single-link
+  target_selector:
+    fabric: fat-tree
+    tier: leaf
+    max_targets: 1
+  notify:
+    - fabric-team-oncall
+    - hpc-scheduling-oncall
+  scheduled_window: "business-hours, non-peak (Tue-Thu 13:00-16:00 local)"
+  abort_conditions:
+    - "no-blackholed-traffic probe fires (any discards observed)"
+    - "any running job reports a fabric timeout error"
+
+method:
+  - type: action
+    name: disable-fabric-link
+    provider: ssh
+    target: fabric-mon01.hpc.local
+    command: "ibportstate -C mlx5_0 -P 1 {{ target_lid }} {{ target_port }} disable"
+  - type: probe
+    name: confirm-reroute
+    query: 'sum(rate(infiniband_port_xmit_data_bytes_total{link!="disabled"}[1m]))'
+    expected: ">= 0.90 * baseline-fabric-bandwidth within 30s"
+
+rollback:
+  - type: action
+    name: re-enable-fabric-link
+    provider: ssh
+    target: fabric-mon01.hpc.local
+    command: "ibportstate -C mlx5_0 -P 1 {{ target_lid }} {{ target_port }} enable"
+  - type: probe
+    name: confirm-link-up
+    query: 'infiniband_port_state{state="active"}'
+    expected: "== 1 for the target port within 1 minute"
+
+expected_findings:
+  - "OPTIMISTIC CASE: traffic reroutes transparently, bandwidth stays within tolerance"
+  - "REALISTIC CASE (per learn5 Ch 9 Scenario B): a leaf switch's routing table may not be updated to actually use the redundant path, sending traffic into a black hole instead of rerouting — this is exactly the gap this experiment exists to find before a real hardware failure does"
+
+schedule:
+  recurrence: quarterly

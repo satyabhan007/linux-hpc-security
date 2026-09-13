@@ -1,0 +1,69 @@
+# Prometheus scrape config for a bare-metal / HPC fleet.
+# Pattern: one job per exporter type, relabeled with rack/role so PromQL
+# queries and alerts (see alerts.rules.yml) can group by physical topology,
+# not just hostname. Matches learn5 Ch 1 (fleet-wide observability) and
+# Ch 12 (capacity planning needs per-rack/per-role headroom, not one blob).
+
+global:
+  scrape_interval: 15s        # matched to the fastest failure mode we alert on (Ch 1, L4)
+  evaluation_interval: 15s
+  external_labels:
+    fleet: hpc-prod
+
+rule_files:
+  - alerts.rules.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+scrape_configs:
+  # Host-level metrics: CPU, memory, disk, network — the node_exporter
+  # baseline described in Ch 1.
+  - job_name: node
+    file_sd_configs:
+      - files:
+          - targets/node_exporter/*.json
+        refresh_interval: 5m
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  # GPU utilization for HPC compute nodes, used by the Ch 12 capacity
+  # forecast (predict_linear on gpu_utilization_ratio).
+  - job_name: dcgm-gpu
+    file_sd_configs:
+      - files:
+          - targets/dcgm_exporter/*.json
+        refresh_interval: 5m
+
+  # Lustre OSS/MDS metrics — the io-latency signal used in the Ch 15 case
+  # study and the Ch 9 chaos-experiment steady-state hypothesis.
+  - job_name: lustre
+    static_configs:
+      - targets:
+          - oss01.hpc.local:9169
+          - oss02.hpc.local:9169
+          - oss03.hpc.local:9169
+          - mds01.hpc.local:9169
+        labels:
+          role: storage
+
+  # InfiniBand fabric counters — used by the Ch 9 fabric-link failure
+  # experiment to confirm traffic actually reroutes.
+  - job_name: infiniband
+    static_configs:
+      - targets:
+          - fabric-mon01.hpc.local:9315
+        labels:
+          role: fabric
+
+  # Prometheus scraping itself, and Alertmanager — required for the
+  # up == 0 / staleness alert in alerts.rules.yml to have something to
+  # compare every other job's staleness against.
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090

@@ -1,0 +1,85 @@
+# Chaos experiment definition: kill one OSS (Object Storage Server) node
+# in a Lustre parallel filesystem.
+#
+# Matches learn5 Ch 9 (chaos engineering for bare-metal & HPC systems),
+# Scenario A, and is the exact experiment referenced in the Ch 15 case
+# study's "no chaos experiment had ever tested slow degradation, only
+# hard failure" root-cause finding.
+#
+# Format is intentionally tool-agnostic (readable as a design doc, and
+# translatable into a Gremlin/Chaos-Toolkit-style runner) so it works as
+# course material without requiring a specific chaos platform installed.
+
+name: oss-node-hard-failure
+version: "1.0"
+owner: storage-team
+
+description: >
+  Validate that job I/O throughput degrades gracefully (not catastrophically)
+  when one of six OSS nodes in the shared Lustre filesystem fails outright.
+
+steady_state_hypothesis:
+  title: "Job I/O throughput stays within 20% of baseline with one OSS node down"
+  probes:
+    - name: baseline-throughput
+      type: metric
+      query: 'avg_over_time(lustre_client_read_bytes_total[5m])'
+      source: ../observability/prometheus.yml
+      tolerance:
+        min_ratio_of_baseline: 0.80
+    - name: job-submission-success-rate
+      type: metric
+      query: 'sum(rate(scheduler_jobs_submitted_total{status="ok"}[5m])) / sum(rate(scheduler_jobs_submitted_total[5m]))'
+      tolerance:
+        min: 0.99
+
+blast_radius:
+  scope: single-node
+  target_selector:
+    role: storage
+    pool: oss
+    max_targets: 1
+  excluded:
+    - mds01.hpc.local   # never target the metadata server in this experiment
+  notify:
+    - storage-team-oncall
+    - scheduling-team-oncall
+  scheduled_window: "business-hours, non-peak (Tue-Thu 13:00-16:00 local)"
+  abort_conditions:
+    - "job-submission-success-rate drops below 0.90"
+    - "any client reports a filesystem hang (D-state process) for > 60s"
+
+method:
+  - type: action
+    name: stop-lustre-oss-service
+    provider: ssh
+    target: "{{ blast_radius.selected_target }}"
+    command: "systemctl stop lustre-oss"
+  - type: probe
+    name: confirm-failover
+    query: 'lustre_ost_state{state="failed"}'
+    expected: "== 1 for the targeted OST within 2 minutes"
+
+rollback:
+  - type: action
+    name: restart-lustre-oss-service
+    provider: ssh
+    target: "{{ blast_radius.selected_target }}"
+    command: "systemctl start lustre-oss"
+  - type: probe
+    name: confirm-recovery
+    query: 'lustre_ost_state{state="active"}'
+    expected: "== 1 for the targeted OST within 5 minutes"
+    # NOTE (Ch 9, L4 anti-pattern fix): this recovery probe is not optional.
+    # A fault that fails over correctly but recovers badly (e.g. a client
+    # reconnect storm) is still a real production risk that testing only
+    # the failure path would miss entirely.
+
+expected_findings:
+  - "Filesystem failover to remaining OSS nodes works within SLA"
+  - "Client-side retry/timeout tuning may cause a throughput dip larger than expected (see learn5 Ch 9, Scenario A)"
+
+schedule:
+  recurrence: quarterly
+  # Ch 9, L4: infrastructure and configs drift; re-run this on a fixed
+  # cadence, not just once after it is first written.

@@ -1,0 +1,95 @@
+# PromQL alerting rules for the bare-metal/HPC fleet in prometheus.yml.
+# Two groups: fleet-health (staleness/coverage, Ch 1) and slo-burn-rate
+# (multi-window burn-rate paging, Ch 7 + Ch 8).
+
+groups:
+  - name: fleet-health
+    rules:
+      # Ch 1, L4: "no alert on stopped reporting" is the anti-pattern this
+      # closes. A target that silently stops scraping must page, not just
+      # show a stale last-known value.
+      - alert: NodeExporterDown
+        expr: up{job="node"} == 0
+        for: 5m
+        labels:
+          severity: page
+          team: infra
+        annotations:
+          summary: "node_exporter target {{ $labels.instance }} has been down for 5m"
+          description: >-
+            {{ $labels.instance }} has not been scraped successfully for 5
+            minutes. This is a monitoring-coverage gap, not just a metric
+            value problem — treat it as an incident (see learn5 Ch 1, Ch 10).
+
+      # Ch 5: rolling-baseline drift detector, not a fixed threshold. Flags
+      # a node whose memory availability is trending down hard enough to
+      # exhaust headroom within the next 6 hours.
+      - alert: MemoryLeakTrendDetected
+        expr: predict_linear(node_memory_MemAvailable_bytes[6h], 6 * 3600) < 0
+        for: 30m
+        labels:
+          severity: ticket
+          team: infra
+        annotations:
+          summary: "{{ $labels.instance }} memory trending toward exhaustion"
+          description: >-
+            Linear projection of the last 6h of node_memory_MemAvailable_bytes
+            reaches zero within the next 6h. Investigate before it pages as an
+            OOM incident (learn5 Ch 5, Scenario A).
+
+      # Ch 9 / Ch 15: Lustre OSS I/O latency drifting relative to its own
+      # recent baseline — the exact metric the Ch 15 case study shows a
+      # fixed threshold missing for 14 minutes.
+      - alert: LustreOSTLatencyDrift
+        expr: >-
+          abs(lustre_ost_io_latency_seconds
+              - avg_over_time(lustre_ost_io_latency_seconds[1h]))
+          > 3 * stddev_over_time(lustre_ost_io_latency_seconds[1h])
+        for: 5m
+        labels:
+          severity: page
+          team: storage
+        annotations:
+          summary: "OST {{ $labels.instance }} I/O latency is anomalous vs. its own baseline"
+          description: >-
+            Latency is >3 stddev from the 1h rolling mean. Do not wait for a
+            fixed threshold to fire — this is the drift pattern from the Ch
+            15 case study.
+
+  - name: slo-burn-rate
+    rules:
+      # Ch 7: multi-window burn-rate alert for a 99.9% availability SLO on
+      # the "node" job. Fires when the CURRENT burn rate would exhaust the
+      # 30-day error budget in well under the budget period — 14.4x is the
+      # common fast-burn multiplier for a 1h window against a 30d SLO.
+      - alert: ErrorBudgetFastBurn
+        expr: >-
+          (1 - avg_over_time(up{job="node"}[1h])) / (1 - 0.999) > 14.4
+          and
+          (1 - avg_over_time(up{job="node"}[5m])) / (1 - 0.999) > 14.4
+        for: 2m
+        labels:
+          severity: page
+          team: infra
+        annotations:
+          summary: "Fleet availability SLO burning fast (1h+5m window)"
+          description: >-
+            At the current rate the 30-day error budget for the 99.9%
+            availability SLO would be exhausted in well under a day. See
+            learn5 Ch 7 for the burn-rate methodology.
+
+      - alert: ErrorBudgetSlowBurn
+        expr: >-
+          (1 - avg_over_time(up{job="node"}[6h])) / (1 - 0.999) > 6
+          and
+          (1 - avg_over_time(up{job="node"}[30m])) / (1 - 0.999) > 6
+        for: 15m
+        labels:
+          severity: ticket
+          team: infra
+        annotations:
+          summary: "Fleet availability SLO burning steadily (6h+30m window)"
+          description: >-
+            A slower, sustained burn — not urgent enough to page immediately
+            but should consume the team's next planning cycle (Ch 7's
+            "error-budget conversation").
