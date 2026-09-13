@@ -1,0 +1,45 @@
+# Part 3 lab — Prometheus alerting rules (Chapter 13, Chapter 15).
+# Turns raw metrics into pages: a climbing fabric error counter, GPUs
+# allocated-but-idle (job-efficiency waste), and a slurmctld dispatch
+# stall (Chapter 15's lesson — check activity, not just liveness).
+
+groups:
+  - name: part3-hpc-orchestration
+    rules:
+      - alert: InfiniBandSymbolErrorsClimbing
+        expr: increase(ib_port_symbol_error_total[1h]) > 100
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "InfiniBand symbol errors climbing on {{ $labels.instance }}"
+          description: >-
+            Chapter 4: a climbing SymbolErrorCounter typically precedes a
+            link failure. Schedule a cable/port check during planned
+            maintenance before this becomes a job-fatal timeout.
+
+      - alert: GPUAllocatedButIdle
+        expr: DCGM_FI_DEV_GPU_UTIL < 5 and slurm_job_gpu_alloc > 0
+        for: 20m
+        labels:
+          severity: warning
+        annotations:
+          summary: "GPU on {{ $labels.instance }} allocated to a job but under 5% utilized"
+          description: >-
+            Chapter 13: an allocated GPU running near-idle for 20+ minutes
+            usually means a job requested far more GPU capacity than its
+            code actually uses — a candidate for the per-job efficiency
+            report, not necessarily a hardware fault.
+
+      - alert: SlurmctldDispatchStalled
+        expr: increase(slurm_job_state_transitions_total[6m]) == 0
+          and slurm_queue_pending > 0
+        for: 6m
+        labels:
+          severity: critical
+        annotations:
+          summary: "slurmctld has not transitioned any job state in 6 minutes"
+          description: >-
+            Chapter 15: this checks job dispatch ACTIVITY, not just
+            process liveness — the exact gap that let the case-study
+            outage's degraded-but-running controller go undetected.

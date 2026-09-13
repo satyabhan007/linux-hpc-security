@@ -1,0 +1,30 @@
+# Part 3 lab — Warewulf runtime-overlay template (Chapter 2 / Chapter 4)
+#
+# Renders /etc/security/limits.conf on each node from its profile/node
+# Tags, so RDMA-heavy "bignode" instances get the higher memlock ulimit
+# their fabric drivers need for pinned registration buffers, without
+# hardcoding the value per node. Import with:
+#
+#   wwctl overlay import limits.conf.ww bignode /etc/security/limits.conf.ww
+#
+# Warewulf renders this with Go's text/template syntax against the node's
+# resolved Tags (profile tags merged with any per-node override).
+
+# Managed by Warewulf — do not edit on the node itself (Chapter 2: never
+# hand-edit a running node, edit the source template and rebuild/reboot).
+
+{{ if eq .Tags.rdma_enabled "true" }}
+# RDMA fabric requires pinned (locked) memory for registration buffers.
+* soft memlock {{ .Tags.memlock_kb }}
+* hard memlock {{ .Tags.memlock_kb }}
+{{ else }}
+* soft memlock 65536
+* hard memlock 65536
+{{ end }}
+
+# GPU compute nodes commonly need a higher open-file limit for many
+# concurrent CUDA contexts / NCCL connections.
+{{ if .Tags.gpu_count }}
+* soft nofile 1048576
+* hard nofile 1048576
+{{ end }}
