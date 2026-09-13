@@ -1,0 +1,47 @@
+#!/usr/bin/env bpftrace
+/*
+ * sched_latency.bt — histogram of scheduler wakeup-to-running latency,
+ * system-wide, in nanoseconds. Companion to Ch1 (scheduler internals) and
+ * Ch5 (perf/eBPF profiling in production).
+ *
+ * This answers the question from Ch1's L4 anti-pattern table: "a core can
+ * show 60% busy and still have high scheduling latency" — this script
+ * measures that latency directly instead of inferring it from CPU%.
+ *
+ * Usage:
+ *   sudo bpftrace sched_latency.bt
+ *   # let it run under real load, then Ctrl-C to print the final histogram
+ *
+ * Requires: root (or CAP_BPF + CAP_PERFMON), a kernel with CONFIG_BPF=y and
+ * the sched:sched_wakeup{,_new}/sched_switch tracepoints (all mainline
+ * kernels since well before 4.x).
+ */
+
+BEGIN
+{
+	printf("Tracing scheduler wakeup-to-running latency... Hit Ctrl-C to end.\n");
+}
+
+tracepoint:sched:sched_wakeup,
+tracepoint:sched:sched_wakeup_new
+{
+	@qtime[args->pid] = nsecs;
+}
+
+tracepoint:sched:sched_switch
+{
+	$ts = @qtime[args->next_pid];
+	if ($ts != 0) {
+		@sched_latency_ns = hist(nsecs - $ts);
+		delete(@qtime[args->next_pid]);
+	}
+}
+
+END
+{
+	clear(@qtime);
+	printf("\n@sched_latency_ns: wakeup->running latency histogram, nanoseconds.\n");
+	printf("A long tail here on an otherwise idle-looking box points at a\n");
+	printf("runqueue-imbalance or CPU-affinity problem (see Ch1/Ch10), not an\n");
+	printf("application bug.\n");
+}

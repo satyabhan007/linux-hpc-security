@@ -1,0 +1,52 @@
+Example `crash` utility session against a captured vmcore
+===========================================================
+
+Companion to Ch11 (debugging production kernel panics & oopses). This is a
+documented, annotated transcript of a typical investigation — the `crash`
+utility requires an actual vmcore + matching debug symbols to run for real,
+so this file captures the workflow rather than being an executable script.
+
+1. Locate the capture from the panic:
+
+    $ ls /var/crash/2026-03-14-02:11:05/
+    vmcore  vmcore-dmesg.txt
+
+2. Read the captured dmesg first — often enough to spot an obvious oops
+   message before even opening the full vmcore:
+
+    $ less /var/crash/2026-03-14-02:11:05/vmcore-dmesg.txt
+    [123456.789012] BUG: kernel NULL pointer dereference, address: 0000000000000018
+    [123456.789034] RIP: 0010:some_driver_function+0x42/0x120 [some_driver]
+
+3. Open the vmcore in `crash`, with debug symbols matching the EXACT kernel
+   build that panicked (mismatched symbols produce misleading backtraces):
+
+    $ crash /usr/lib/debug/lib/modules/5.15.0-101-generic/vmlinux \
+            /var/crash/2026-03-14-02:11:05/vmcore
+
+4. Inside the crash session, the standard first three commands:
+
+    crash> sys              # basic system info: kernel version, uptime, panic string
+    crash> log               # the kernel ring buffer at time of panic
+    crash> bt                # backtrace of the crashing context (the CPU that panicked)
+
+5. Narrow down further once you have a suspect function:
+
+    crash> bt -a              # backtraces for ALL CPUs (find what else was running)
+    crash> ps | grep RU        # processes in the running state at panic time
+    crash> mod                 # loaded kernel modules -- check for out-of-tree/3rd-party drivers
+    crash> dis some_driver_function     # disassemble around the faulting instruction
+
+6. Confirm root cause hypothesis, e.g. a third-party driver:
+
+    crash> mod -s some_driver /path/to/matching/some_driver.ko
+    crash> sym some_driver_function     # resolve the exact symbol/offset
+
+7. Exit and file/track the finding:
+
+    crash> quit
+
+Retain the vmcore and matching debug symbols until root cause is confirmed
+(Ch11's anti-pattern table: "discarding vmcores after a quick glance at
+dmesg" — dmesg alone often lacks the full call stack and register state a
+real fix needs).

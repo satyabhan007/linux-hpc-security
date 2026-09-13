@@ -1,0 +1,7 @@
+# Managed by Ansible role sysctl_baseline — do not edit by hand.
+# Source of truth: learn2/labs/sysctl-fleet-baseline/ansible/roles/sysctl_baseline/defaults/main.yml
+# A hand edit here will be silently overwritten on the next Ansible run,
+# and disappears on reimage (Ch13's whole point: config, not tribal knowledge).
+{% for key, value in sysctl_baseline.items() %}
+{{ key }} = {{ value }}
+{% endfor %}

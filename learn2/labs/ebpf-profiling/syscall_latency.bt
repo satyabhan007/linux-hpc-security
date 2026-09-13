@@ -1,0 +1,43 @@
+#!/usr/bin/env bpftrace
+/*
+ * syscall_latency.bt — per-syscall latency histogram and top-N call-count
+ * summary, filterable to one process. Companion to Ch5 (perf/eBPF
+ * profiling) and Ch9 (syscall tracing & auditing) — answers "which
+ * specific syscall is slow, and how often is it called" without the
+ * overhead of a full strace -T session.
+ *
+ * Usage:
+ *   sudo bpftrace syscall_latency.bt                 # system-wide
+ *   sudo bpftrace syscall_latency.bt -c 'nginx'       # trace one command
+ *   sudo bpftrace --usdt-file-activation syscall_latency.bt -p <pid>
+ *
+ * Ctrl-C prints:
+ *   @latency_ns[syscall]  — a latency histogram per syscall ID
+ *   @calls[syscall]       — a call-count table per syscall ID
+ */
+
+BEGIN
+{
+	printf("Tracing syscall latency... Hit Ctrl-C to end.\n");
+}
+
+tracepoint:raw_syscalls:sys_enter
+{
+	@start[tid] = nsecs;
+	@calls[args->id] = count();
+}
+
+tracepoint:raw_syscalls:sys_exit
+/@start[tid]/
+{
+	@latency_ns[args->id] = hist(nsecs - @start[tid]);
+	delete(@start[tid]);
+}
+
+END
+{
+	clear(@start);
+	printf("\n@calls: syscall ID -> call count. @latency_ns: syscall ID -> latency histogram.\n");
+	printf("Cross-reference syscall IDs against /usr/include/asm/unistd_64.h ");
+	printf("or `ausyscall <id>` to get names.\n");
+}
