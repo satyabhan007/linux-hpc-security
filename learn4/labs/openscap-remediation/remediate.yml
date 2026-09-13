@@ -1,0 +1,56 @@
+---
+# Illustrative Ansible remediation playbook — the kind of output
+# `oscap xccdf generate fix --fix-type ansible` produces, trimmed to a
+# small, safe, idempotent subset matching profile-fragment.xml's two rules
+# plus one supporting control (auditd presence). Every task is safe to run
+# repeatedly and safe to run in --check mode.
+#
+# Real workflow (see README.md):
+#   ansible-playbook -i inventory.ini remediate.yml --check --diff   # review
+#   ansible-playbook -i inventory.ini remediate.yml --limit canary   # apply, canary first
+
+- name: Apply a small, safe subset of STIG-style hardening controls
+  hosts: all
+  become: true
+  vars:
+    ssh_config_path: /etc/ssh/sshd_config
+    pwquality_config_path: /etc/security/pwquality.conf
+    pwquality_minlen: 15
+
+  tasks:
+    - name: xccdf_org.example.content_rule_sshd_disable_root_login — disable SSH root login
+      ansible.builtin.lineinfile:
+        path: "{{ ssh_config_path }}"
+        regexp: '^\s*#?\s*PermitRootLogin\s+'
+        line: "PermitRootLogin no"
+        state: present
+        validate: /usr/sbin/sshd -t -f %s
+      notify: Reload sshd
+
+    - name: xccdf_org.example.content_rule_accounts_password_minlen — enforce minimum password length
+      ansible.builtin.lineinfile:
+        path: "{{ pwquality_config_path }}"
+        regexp: '^\s*#?\s*minlen\s*='
+        line: "minlen = {{ pwquality_minlen }}"
+        state: present
+        create: true
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Supporting control — ensure auditd is installed
+      ansible.builtin.package:
+        name: audit
+        state: present
+
+    - name: Supporting control — ensure auditd is enabled and running
+      ansible.builtin.systemd:
+        name: auditd
+        enabled: true
+        state: started
+
+  handlers:
+    - name: Reload sshd
+      ansible.builtin.systemd:
+        name: sshd
+        state: reloaded

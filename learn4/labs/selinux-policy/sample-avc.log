@@ -1,0 +1,2 @@
+type=AVC msg=audit(1735689600.123:456): avc:  denied  { write } for  pid=4821 comm="webapp" name="cache" dev="dm-0" ino=131099 scontext=system_u:system_r:webapp_t:s0 tcontext=system_u:object_r:var_t:s0 tclass=dir permissive=0
+type=SYSCALL msg=audit(1735689600.123:456): arch=c000003e syscall=257 success=no exit=-13 a0=ffffff9c a1=55d3a1b2c8e0 a2=241 a3=1b6 items=0 ppid=1 pid=4821 auid=4294967295 uid=993 gid=990 euid=993 suid=993 fsuid=993 egid=990 sgid=990 fsgid=990 tty=(none) ses=4294967295 comm="webapp" exe="/usr/bin/webapp" subj=system_u:system_r:webapp_t:s0 key=(null)

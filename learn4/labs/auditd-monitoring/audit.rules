@@ -1,0 +1,58 @@
+# audit.rules — scoped privileged-command / tamper-detection ruleset.
+# Companion to Chapter 8 (auditd & eBPF-based intrusion detection).
+#
+# Deliberately scoped: every rule below maps to one specific, nameable
+# threat, not "watch everything." See README.md for the threat-model table.
+#
+# Load with: augenrules --load  (after copying into /etc/audit/rules.d/)
+
+## First rule — delete all existing rules before loading this set
+-D
+
+## Increase the kernel audit buffer so a burst of events isn't dropped
+-b 8192
+
+## Fail mode: 1 = print failures to console+syslog but keep booting
+-f 1
+
+# ---------------------------------------------------------------------
+# Privileged command execution — track every use of sudo/su, tagged for
+# fast lookup during an investigation (ausearch -k priv_cmd).
+# ---------------------------------------------------------------------
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/sudo -F key=priv_cmd
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/su -F key=priv_cmd
+
+# ---------------------------------------------------------------------
+# Auth/privilege configuration tampering — a write to any of these files
+# outside a known change-management window is a strong compromise signal.
+# ---------------------------------------------------------------------
+-w /etc/shadow -p wa -k auth_tamper
+-w /etc/passwd -p wa -k auth_tamper
+-w /etc/group -p wa -k auth_tamper
+-w /etc/sudoers -p wa -k auth_tamper
+-w /etc/sudoers.d/ -p wa -k auth_tamper
+
+# ---------------------------------------------------------------------
+# SSH hardening rollback — a write here could silently undo Chapter 1's
+# STIG-enforced SSH settings (e.g. re-enabling root login).
+# ---------------------------------------------------------------------
+-w /etc/ssh/sshd_config -p wa -k ssh_config_tamper
+
+# ---------------------------------------------------------------------
+# Attempts to disable auditing itself — a common early step in covering
+# tracks after an initial compromise.
+# ---------------------------------------------------------------------
+-w /sbin/auditctl -p x -k audit_tamper
+-w /usr/sbin/auditctl -p x -k audit_tamper
+-a always,exit -F arch=b64 -S execve -F path=/usr/bin/systemctl -F a1=stop -F key=audit_tamper
+
+# ---------------------------------------------------------------------
+# Kernel module loading — a common rootkit/persistence technique
+# (see Chapter 4: kernel hardening & lockdown mode).
+# ---------------------------------------------------------------------
+-a always,exit -F arch=b64 -S init_module -S finit_module -F key=kmod_load
+-a always,exit -F arch=b64 -S delete_module -F key=kmod_load
+
+## Make the configuration immutable until reboot (STIG-recommended for
+## production hosts; comment out while iterating on this ruleset).
+# -e 2
