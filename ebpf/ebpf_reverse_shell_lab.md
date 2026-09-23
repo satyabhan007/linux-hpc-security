@@ -1,14 +1,14 @@
-# Lab: Real-Time Reverse Shell Detection with eBPF
+# Lab: Real-Time Reverse Shell Detection & Systems Troubleshooting with eBPF
 
 **Module:** Threat Detection & Systems Internals  
 **Difficulty:** Advanced (Level 2)  
-**Environment:** Privileged Docker Container (Ubuntu 22.04)
+**Environment:** Privileged Docker Container (Ubuntu 22.04) on Modern Linux Hosts
 
 ## 📌 Overview
 
-In this lab, you will move beyond configuring existing security tools (like SIEMs) and dive into the Linux kernel itself. You will write a custom **eBPF (Extended Berkeley Packet Filter)** program using **BCC (BPF Compiler Collection)** and Python. 
+In this lab, you will write a custom **eBPF (Extended Berkeley Packet Filter)** program using **BCC (BPF Compiler Collection)** and Python. You will hook into the kernel's `execve` tracepoint to monitor process creation in real-time. 
 
-Your eBPF program will hook into the kernel's `execve` tracepoint to monitor process creation in real-time. If it detects a suspicious binary execution—such as `netcat` or `bash` being spawned in a reverse-shell context—it will instantly stream an alert to user-space.
+More importantly, this lab mimics **real-world systems engineering**. You will encounter compiler mismatches, write C code to extract process trees from kernel memory, and analyze a real-world SOC (Security Operations Center) false positive.
 
 ---
 
@@ -23,7 +23,7 @@ sequenceDiagram
 
     Attacker (User Space)->>Kernel (VFS / Syscalls): Runs `nc -e /bin/bash` (execve syscall)
     Kernel (VFS / Syscalls)->>eBPF Program (Kernel Space): Tracepoint Triggered (sys_enter_execve)
-    note right of eBPF Program (Kernel Space): eBPF extracts PID, Command, and Filename
+    note right of eBPF Program (Kernel Space): eBPF extracts PID, PPID, Command, and Filename
     eBPF Program (Kernel Space)-->>Python Agent (User Space): Sends struct via BPF_PERF_OUTPUT buffer
     Python Agent (User Space)->>Python Agent (User Space): Evaluates heuristic ("is this netcat?")
     Python Agent (User Space)->>Attacker (User Space): Prints 🔴 ALERT to stdout / SIEM
@@ -31,41 +31,46 @@ sequenceDiagram
 
 ---
 
-## 🛠️ Step 1: The Lab Environment (`Dockerfile`)
+## 🛠️ Phase 1: The Lab Environment
 
-Because eBPF interacts directly with the Linux kernel, it requires root privileges and specific kernel headers. To keep your host machine safe and clean, we will run the lab inside a privileged Docker container.
+Because eBPF compiles C code dynamically against your host kernel, we must mount your host's kernel headers into the Docker container.
 
-Create a file named `Dockerfile`:
+### 1. Create the `Dockerfile`
 
 ```dockerfile
-# Use a standard Ubuntu base image
 FROM ubuntu:22.04
-
-# Avoid tzdata interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
-
-# Install BCC tools, Python bindings, and netcat for our attack simulation
 RUN apt-get update && apt-get install -y \
     bpfcc-tools \
     python3-bpfcc \
     linux-headers-generic \
     netcat \
     && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /lab
 COPY detector.py .
-
-# Keep the container running
 CMD ["/bin/bash"]
+```
+
+### 2. Build and Run the Container
+You **must** mount `/lib/modules` and `/usr/src` so the BCC compiler inside the container can see your laptop's kernel headers.
+
+```bash
+# Build the image
+sudo docker build -t ebpf-lab .
+
+# Run the privileged container (copy as a single block)
+sudo docker run -it --rm --privileged \
+  -v /sys/kernel/debug:/sys/kernel/debug:rw \
+  -v /lib/modules:/lib/modules:ro \
+  -v /usr/src:/usr/src:ro \
+  ebpf-lab
 ```
 
 ---
 
-## 💻 Step 2: The eBPF Threat Detector (`detector.py`)
+## 💻 Phase 2: The eBPF Threat Detector (`detector.py`)
 
-Create a file named `detector.py`. This script contains two parts: 
-1. The **C Code** that runs *inside* the kernel (capturing the syscall).
-2. The **Python Code** that runs in user-space (reading the buffer and generating alerts).
+Inside the container, create `detector.py`. This script includes an **advanced tweak**: we reach directly into the kernel's `task_struct` to extract the **Parent PID (PPID)**. This allows us to see the process tree (e.g., did `nginx` spawn the shell, or did `bash`?).
 
 ```python
 #!/usr/bin/env python3
@@ -75,59 +80,52 @@ from bcc import BPF
 bpf_text = """
 #include <uapi/linux/ptrace.h>
 #include <linux/sched.h>
-#include <linux/fs.h>
+// Note: <linux/fs.h> is intentionally omitted to prevent Clang static_assert errors on modern kernels
 
-// Define the data structure we will send to user-space
 struct data_t {
     u32 pid;
+    u32 ppid; // NEW: Parent Process ID
     char comm[TASK_COMM_LEN];
     char fname[256];
 };
 
-// Define a perf ring buffer to stream events to Python
 BPF_PERF_OUTPUT(events);
 
-// Hook the 'execve' syscall tracepoint
 TRACEPOINT_PROBE(syscalls, sys_enter_execve) {
     struct data_t data = {};
     
-    // Get Process ID
+    // Get current process task struct from the kernel
+    struct task_struct *task = (struct task_struct *)bpf_get_current_task();
+    
+    // Extract PID and Parent PID (tgid)
     data.pid = bpf_get_current_pid_tgid() >> 32;
+    data.ppid = task->real_parent->tgid; 
     
-    // Get the name of the process making the syscall
     bpf_get_current_comm(&data.comm, sizeof(data.comm));
-    
-    // Get the filename being executed
     bpf_probe_read_user_str(&data.fname, sizeof(data.fname), args->filename);
     
-    // Submit the data to the perf buffer
     events.perf_submit(args, &data, sizeof(data));
     return 0;
 }
 """
 
-# 2. Python User-Space Agent
-# Compile and inject the eBPF program into the kernel
 b = BPF(text=bpf_text)
 
-print("🚀 eBPF Reverse Shell Detector running... (Press Ctrl+C to stop)")
-print(f"{'PID':<10} {'CALLING COMM':<15} {'FILE EXECUTED'}")
+print("🚀 ADVANCED eBPF Detector running... (Press Ctrl+C to stop)")
+print(f"{'PID':<8} {'PPID':<8} {'CALLING COMM':<15} {'FILE EXECUTED'}")
 
-# Callback function to handle data from the perf buffer
 def print_event(cpu, data, size):
     event = b["events"].event(data)
     fname = event.fname.decode('utf-8', 'replace')
     comm = event.comm.decode('utf-8', 'replace')
     
-    # Threat Heuristic: Alert if netcat (nc) is executed
-    alert = "🔴 ALERT: Potential Reverse Shell!" if "nc" in comm or "nc" in fname else ""
+    # NAIVE Heuristic: Alert if the string 'nc' is found
+    alert = "🔴 REVERSE SHELL THREAT!" if "nc" in comm or "nc" in fname else ""
     
-    print(f"{event.pid:<10} {comm:<15} {fname:<30} {alert}")
+    print(f"{event.pid:<8} {event.ppid:<8} {comm:<15} {fname:<30} {alert}")
 
-# Open the perf buffer and attach the callback
 b["events"].open_perf_buffer(print_event)
 
-# Infinite loop to keep reading the buffer
 while True:
     try:
         b.perf_buffer_poll()
@@ -138,48 +136,51 @@ while True:
 
 ---
 
-## 🎯 Step 3: Execution and Attack Simulation
+## 🛑 Phase 3: Real-World Troubleshooting
 
-Now, let's build the environment, run the detector, and simulate a reverse shell attack.
+### The `<linux/fs.h>` Compilation Error
+If you ever try to include `#include <linux/fs.h>` in the C code above, the Clang compiler might crash with an alignment mismatch on modern host kernels (e.g., Ubuntu 7.0+):
+`error: static_assert failed due to requirement 'sizeof(struct filename) % 64 == 0'`
 
-### 1. Build and Run the Container
-You must use `--privileged` and mount the host's `/sys/kernel/debug` directory for eBPF to function correctly inside Docker.
-
+**The Fix:** eBPF is highly efficient. For `execve` tracing, we actually don't need the massive `fs.h` header! If you ever encounter this in older scripts, use this command to delete the include:
 ```bash
-docker build -t ebpf-lab .
-docker run -it --rm --privileged -v /sys/kernel/debug:/sys/kernel/debug:rw ebpf-lab
-```
-
-### 2. Start the eBPF Detector
-Inside the container, run your Python script in the background (or in a separate terminal tab):
-```bash
-python3 detector.py &
-```
-*(You will see the startup message and table headers appear).*
-
-### 3. Simulate the Attack
-Now, act as the attacker. Try to execute a standard benign command first, then simulate a reverse shell using `netcat`.
-
-```bash
-# Benign execution (will be logged, but no alert)
-ls -la
-
-# Malicious execution (Reverse Shell)
-nc -lvnp 4444 -e /bin/bash
-```
-
-### 4. Observe the Telemetry
-Your eBPF program intercepts the syscalls deep within the kernel and immediately outputs:
-```text
-PID        CALLING COMM    FILE EXECUTED
-104        bash            /usr/bin/ls                    
-105        bash            /usr/bin/nc                    🔴 ALERT: Potential Reverse Shell!
+sed -i '/#include <linux\/fs.h>/d' detector.py
 ```
 
 ---
 
-## 🧠 Metacognition & Takeaways
+## 🎯 Phase 4: Execution and The "False Positive" Lesson
 
-By completing this lab, you have bridged the gap between *System Administration* and *Kernel Engineering*. 
-*   **Why is this better than traditional logging?** Standard logs (like `syslog` or `bash_history`) can be tampered with or bypassed by attackers. Because eBPF hooks into the kernel's tracepoints, the attacker *cannot* hide the `execve` syscall from the OS, making this telemetry tamper-proof.
-*   **Next Steps:** How would you modify the C code to actually *block* the execution instead of just logging it? (Hint: Look into eBPF `LSM` (Linux Security Modules) or `bpf_override_return`).
+Start your detector in the background:
+```bash
+python3 detector.py &
+```
+
+Now, open a **brand new terminal window** on your host laptop. Look at the eBPF output in your container:
+
+```text
+PID      PPID     CALLING COMM    FILE EXECUTED
+442332   329971   systemd-run     /usr/bin/bash                  
+442341   442332   bash            /usr/bin/dircolors             
+442343   442332   bash            /usr/libexec/vte-urlencode-cwd 🔴 REVERSE SHELL THREAT!
+```
+
+### The SOC Engineering Takeaway
+Wait, why did `/usr/libexec/vte-urlencode-cwd` trigger the red threat alert?
+
+Look at our Python heuristic: `if "nc" in comm or "nc" in fname`
+Because we used a simple substring search, the letters `nc` inside the word `urle**nc**ode` triggered the alarm! 
+
+This is a rite of passage for every SOC engineer: **The False Positive**. If deployed to production, this naive rule would flood your SIEM with thousands of fake alerts every time someone opened a terminal. 
+*Fix:* In a real EDR, you must use exact string matching or regex boundaries (e.g., `comm == "nc"`).
+
+### Triggering the Real Attack
+Finally, in your new terminal window, simulate the actual attack:
+```bash
+nc -lvnp 4444 -e /bin/bash
+```
+
+Back in your eBPF logs, you will see the true threat intercepted deep in the kernel, complete with its Parent PID:
+```text
+442644   442332   bash            /usr/bin/nc                    🔴 REVERSE SHELL THREAT!
+```
