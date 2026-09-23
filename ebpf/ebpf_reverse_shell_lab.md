@@ -1,32 +1,42 @@
 # Lab: Real-Time Reverse Shell Detection & Systems Troubleshooting with eBPF
 
 **Module:** Threat Detection & Systems Internals  
-**Difficulty:** Advanced (Level 2)  
+**Difficulty:** Advanced (Level 3)  
 **Environment:** Privileged Docker Container (Ubuntu 22.04) on Modern Linux Hosts
 
 ## 📌 Overview
 
-In this lab, you will write a custom **eBPF (Extended Berkeley Packet Filter)** program using **BCC (BPF Compiler Collection)** and Python. You will hook into the kernel's `execve` tracepoint to monitor process creation in real-time. 
+In this lab, you will write a custom **eBPF (Extended Berkeley Packet Filter)** program using **BCC (BPF Compiler Collection)** and Python. 
 
-More importantly, this lab mimics **real-world systems engineering**. You will encounter compiler mismatches, write C code to extract process trees from kernel memory, and analyze a real-world SOC (Security Operations Center) false positive.
+More importantly, this lab mimics **real-world systems engineering**. You will map the strict memory boundaries of Ring 0 and Ring 3, write C code to extract process trees from kernel memory, analyze a real-world SOC false positive, and deliberately trigger the eBPF Kernel Verifier.
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture: Memory & State Boundaries
+
+To understand eBPF, you must understand the strict boundary between Kernel Space (Ring 0) and User Space (Ring 3).
 
 ```mermaid
-sequenceDiagram
-    participant Attacker as Attacker (User Space)
-    participant Kernel as Kernel (VFS/Syscalls)
-    participant eBPF as eBPF Program
-    participant Python as Python Agent
-    
-    Attacker->>Kernel: Runs nc
-    Kernel->>eBPF: Tracepoint Triggered
-    note right of eBPF: eBPF extracts PID, PPID, Command
-    eBPF-->>Python: Sends struct via buffer
-    Python->>Python: Evaluates heuristic
-    Python->>Attacker: Prints ALERT
+stateDiagram-v2
+    direction TB
+    state "Ring 0 (Kernel Space)" as Ring0 {
+        Tracepoint: sys_enter_execve
+        eBPF_Prog: eBPF C Program
+        PerfBuffer: BPF_PERF_OUTPUT (Ring Buffer)
+        Tracepoint --> eBPF_Prog: 1. Syscall Trigger
+        eBPF_Prog --> PerfBuffer: 2. Write Struct (Non-blocking)
+    }
+    state "Ring 3 (User Space)" as Ring3 {
+        Python: Python Agent
+        Attacker: nc -e /bin/bash
+        Attacker --> Tracepoint : 0. Execution
+        PerfBuffer --> Python: 3. Asynchronous Poll
+    }
+    note right of PerfBuffer
+        Shared memory map.
+        Prevents expensive context 
+        switches per event.
+    end note
 ```
 
 ---
@@ -70,7 +80,7 @@ sudo docker run -it --rm --privileged \
 
 ## 💻 Phase 2: The eBPF Threat Detector (`detector.py`)
 
-Inside the container, create `detector.py`. This script includes an **advanced tweak**: we reach directly into the kernel's `task_struct` to extract the **Parent PID (PPID)**. This allows us to see the process tree (e.g., did `nginx` spawn the shell, or did `bash`?).
+Inside the container, create `detector.py`. This script includes an **advanced tweak**: we reach directly into the kernel's `task_struct` to extract the **Parent PID (PPID)**. 
 
 ```python
 #!/usr/bin/env python3
@@ -102,6 +112,8 @@ TRACEPOINT_PROBE(syscalls, sys_enter_execve) {
     data.ppid = task->real_parent->tgid; 
     
     bpf_get_current_comm(&data.comm, sizeof(data.comm));
+    
+    // Safely transfer memory from User Space to Kernel Space
     bpf_probe_read_user_str(&data.fname, sizeof(data.fname), args->filename);
     
     events.perf_submit(args, &data, sizeof(data));
@@ -134,15 +146,21 @@ while True:
         exit()
 ```
 
+> [!TIP]
+> **Trade-Off Mechanics: Why `bpf_probe_read_user_str`?**
+> Look at the C code above. Why can't the eBPF program just read the `args->filename` pointer directly? 
+> **Analogy:** It’s like a bank teller (the kernel) receiving a lockbox from a customer (user-space). The teller cannot just open it on the counter; they must safely transfer it behind bulletproof glass first. 
+> **The Engineering Reality:** If a user-space pointer is invalid, malicious, or paged out to disk, reading it directly in Ring 0 would trigger a fatal page fault and instantly crash the entire operating system. `bpf_probe_read` contains strict error handling to safely read that memory without risking a Kernel Panic.
+
 ---
 
 ## 🛑 Phase 3: Real-World Troubleshooting
 
 ### The `<linux/fs.h>` Compilation Error
-If you ever try to include `#include <linux/fs.h>` in the C code above, the Clang compiler might crash with an alignment mismatch on modern host kernels (e.g., Ubuntu 7.0+):
+If you ever try to include `#include <linux/fs.h>` in the C code above, the Clang compiler might crash with an alignment mismatch on modern host kernels:
 `error: static_assert failed due to requirement 'sizeof(struct filename) % 64 == 0'`
 
-**The Fix:** eBPF is highly efficient. For `execve` tracing, we actually don't need the massive `fs.h` header! If you ever encounter this in older scripts, use this command to delete the include:
+**The Fix:** eBPF is highly efficient. For `execve` tracing, we actually don't need the massive `fs.h` header! If you ever encounter this, use this command to delete the include:
 ```bash
 sed -i '/#include <linux\/fs.h>/d' detector.py
 ```
@@ -161,29 +179,48 @@ Now, open a **brand new terminal window** on your host laptop. Look at the eBPF 
 ```text
 PID      PPID     CALLING COMM    FILE EXECUTED
 442332   329971   systemd-run     /usr/bin/bash                  
-442341   442332   bash            /usr/bin/dircolors             
 442343   442332   bash            /usr/libexec/vte-urlencode-cwd 🔴 REVERSE SHELL THREAT!
 ```
 
 ### The SOC Engineering Takeaway
 Wait, why did `/usr/libexec/vte-urlencode-cwd` trigger the red threat alert?
-
 Look at our Python heuristic: `if "nc" in comm or "nc" in fname`
 Because we used a simple substring search, the letters `nc` inside the word `urle**nc**ode` triggered the alarm! 
 
-This is a rite of passage for every SOC engineer: **The False Positive**. If deployed to production, this naive rule would flood your SIEM with thousands of fake alerts every time someone opened a terminal. 
-*Fix:* In a real EDR, you must use exact string matching or regex boundaries (e.g., `comm == "nc"`).
+This is a rite of passage for every SOC engineer: **The False Positive**. If deployed to production, this naive rule would flood your SIEM with thousands of fake alerts. In a real EDR, you must use exact string matching boundaries (e.g., `comm == "nc"`).
 
 ### Triggering the Real Attack
-Finally, in your new terminal window, simulate the actual attack:
+In your new terminal window, simulate the actual attack:
 ```bash
 nc -lvnp 4444 -e /bin/bash
 ```
 
-Back in your eBPF logs, you will see the true threat intercepted deep in the kernel, complete with its Parent PID:
+Back in your eBPF logs, you will see the true threat intercepted deep in the kernel:
 ```text
 442644   442332   bash            /usr/bin/nc                    🔴 REVERSE SHELL THREAT!
 ```
+
+---
+
+## 💥 Phase 5: Deliberate Failure (Testing the Verifier)
+
+The easiest way to prove you understand eBPF is to intentionally break it. eBPF is famous for its **Verifier**, which mathematically guarantees kernel safety by statically analyzing your C code *before* it is allowed to run.
+
+Let's try to crash the kernel by adding an infinite loop. Add this to your C code inside the tracepoint:
+
+```c
+#pragma unroll(false)
+while (1) {
+    data.pid++;
+}
+```
+
+When you run `python3 detector.py`, the kernel verifier will instantly reject it and throw an error:
+```text
+BPF program is too large. Processed 1000000 insn
+```
+
+**The Lesson:** Unlike standard Linux kernel modules (`.ko`) which will happily execute an infinite loop and cause a hard system freeze (Kernel Panic), the eBPF verifier mathematically proves your program will terminate before it is allowed to touch Ring 0!
 
 <!-- Mermaid JS for GitHub Pages -->
 <script type="module">
