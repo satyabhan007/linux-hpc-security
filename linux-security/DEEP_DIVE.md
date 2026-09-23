@@ -142,3 +142,20 @@ getcap -r / 2>/dev/null ; getpcaps <pid> ; capsh --print
 systemd-analyze security <unit>            # ranks a unit's sandboxing 0-10
 cat /sys/kernel/security/lockdown ; mokutil --sb-state
 ```
+
+<!-- Mermaid JS for GitHub Pages -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false });
+  document.addEventListener('DOMContentLoaded', async () => {
+    const codeBlocks = document.querySelectorAll('code.language-mermaid');
+    for (let block of codeBlocks) {
+      const pre = block.parentElement;
+      const mermaidDiv = document.createElement('div');
+      mermaidDiv.className = 'mermaid';
+      mermaidDiv.textContent = block.textContent;
+      pre.replaceWith(mermaidDiv);
+    }
+    await mermaid.run();
+  });
+</script>

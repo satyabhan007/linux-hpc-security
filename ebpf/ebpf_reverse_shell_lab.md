@@ -184,3 +184,20 @@ Back in your eBPF logs, you will see the true threat intercepted deep in the ker
 ```text
 442644   442332   bash            /usr/bin/nc                    🔴 REVERSE SHELL THREAT!
 ```
+
+<!-- Mermaid JS for GitHub Pages -->
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false });
+  document.addEventListener('DOMContentLoaded', async () => {
+    const codeBlocks = document.querySelectorAll('code.language-mermaid');
+    for (let block of codeBlocks) {
+      const pre = block.parentElement;
+      const mermaidDiv = document.createElement('div');
+      mermaidDiv.className = 'mermaid';
+      mermaidDiv.textContent = block.textContent;
+      pre.replaceWith(mermaidDiv);
+    }
+    await mermaid.run();
+  });
+</script>
