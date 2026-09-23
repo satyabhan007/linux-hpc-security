@@ -95,6 +95,30 @@ render Warewulf overlay templates, and so on, in a few dozen readable lines.
 
 ---
 
+
+## 🔥 Featured Capstone: The Autonomous AI Defense Journey
+
+This curriculum doesn't just teach traditional systems administration; it explores the bleeding-edge intersection of **eBPF Kernel Engineering** and **TypeSafe AI Orchestration**. 
+
+Check out our latest end-to-end journey highlighting how modern AI swarms defend Linux clusters:
+
+1. **[The eBPF Reverse Shell Lab](ebpf/ebpf_reverse_shell_lab.md)**
+   * **The Code:** We wrote raw C code to extract process trees (PPID) directly from kernel memory.
+   * **The Diagrams:** Features a strict `stateDiagram-v2` mapping the memory boundaries of Ring 0 (Kernel) vs Ring 3 (User Space) via the `BPF_PERF_OUTPUT` ring buffer.
+   * **The Findings:** We explored the "Bank Teller" analogy for `bpf_probe_read`, resolved modern Clang compiler mismatches (`<linux/fs.h>`), and deliberately triggered the eBPF Verifier with an infinite loop to prove kernel safety guarantees.
+
+2. **[Linux Security & The LSM Pipeline](linux-security/DEEP_DIVE.md)**
+   * **The Diagrams:** Mapped the exact Order of Operations for the Linux Kernel defense pipeline.
+   * **The Findings:** Explored the "Bouncer vs. Camera" analogy (Seccomp vs. SELinux), and the deliberate failure mechanics of `NoNewPrivileges` dropping `setuid` escalation.
+
+3. **[The Autonomous SIEM Architecture](splunk/DEEP_DIVE.md)**
+   * **The Diagrams:** The 5-Layer Autonomous Stack (Edge, Ingestion, Data, Cognitive Swarm, Enforcement).
+   * **The Findings:** How to combine eBPF (Sensors), LangGraph (Orchestrator), GraphQL (Context Layer), and DSPy (Prompt Compiler) to mitigate DDoS and Supply Chain attacks in under 400 milliseconds.
+
+4. **[The AI Guardrail Code](ebpf/typesafe_guardrail.py)**
+   * **The Findings:** Why raw LLMs are too dangerous for kernel execution. Features a live, runnable Python script using the **TypeSafe AI API** (System One models). It proves how to use `Noul` (probability) and `Choice` primitives to force an AI into deterministic, safe execution blocks.
+
+---
 ## 📚 Guide index
 
 | Module | Beginner | Deep dive | Interview |
