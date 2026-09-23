@@ -103,7 +103,7 @@ render Warewulf overlay templates, and so on, in a few dozen readable lines.
 | Security hardening | [Guide](hardening/BEGINNER_GUIDE.md) | [Deep Dive](hardening/DEEP_DIVE.md) | [Q&A](hardening/INTERVIEW.md) |
 | STIGs & compliance | [Guide](stigs/BEGINNER_GUIDE.md) | [Deep Dive](stigs/DEEP_DIVE.md) | [Q&A](stigs/INTERVIEW.md) |
 | HPC benchmarking | [Guide](benchmarking/BEGINNER_GUIDE.md) | [Deep Dive](benchmarking/DEEP_DIVE.md) | [Q&A](benchmarking/INTERVIEW.md) |
-| eBPF & observability | [Guide](ebpf/BEGINNER_GUIDE.md) | [Deep Dive](ebpf/DEEP_DIVE.md) | [Q&A](ebpf/INTERVIEW.md) |
+| eBPF & observability | [Guide](ebpf/BEGINNER_GUIDE.md) | [Deep Dive](ebpf/DEEP_DIVE.md) & [Applied Lab 🚀](ebpf/ebpf_reverse_shell_lab.md) | [Q&A](ebpf/INTERVIEW.md) |
 | Ansible automation | [Guide](ansible/BEGINNER_GUIDE.md) | [Deep Dive](ansible/DEEP_DIVE.md) | [Q&A](ansible/INTERVIEW.md) |
 | Warewulf provisioning | [Guide](warewulf/BEGINNER_GUIDE.md) | [Deep Dive](warewulf/DEEP_DIVE.md) | [Q&A](warewulf/INTERVIEW.md) |
 | HPC / Slurm architecture | [Guide](hpc/BEGINNER_GUIDE.md) | [Deep Dive](hpc/DEEP_DIVE.md) | [Q&A](hpc/INTERVIEW.md) |
