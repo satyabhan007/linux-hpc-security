@@ -9,20 +9,20 @@ Before diving into scenarios, a Senior Engineer must understand **order of opera
 ```mermaid
 stateDiagram-v2
     direction LR
-    UserSpace : User-Space Process
-    Syscall : System Call (e.g., open)
-    Seccomp : Seccomp-BPF
-    DAC : Discretionary Access Control (UID/GID)
-    LSM : Linux Security Module (SELinux/AppArmor)
-    IMA : Integrity Measurement Architecture
-    Hardware : Disk / Device
+    UserSpace: User-Space Process
+    Syscall: System Call
+    Seccomp: Seccomp-BPF
+    DAC: Discretionary Access
+    LSM: Linux Security Module
+    IMA: Integrity Measurement
+    Hardware: Disk / Device
 
     UserSpace --> Syscall
-    Syscall --> Seccomp : 1. Syscall Filter
-    Seccomp --> DAC : 2. Identity Check
-    DAC --> LSM : 3. Mandatory Access Control
-    LSM --> IMA : 4. Signature/Hash Check
-    IMA --> Hardware : 5. Execution/Access
+    Syscall --> Seccomp : 1. Filter
+    Seccomp --> DAC : 2. ID Check
+    DAC --> LSM : 3. MAC
+    LSM --> IMA : 4. Sig Check
+    IMA --> Hardware : 5. Access
     
     note right of Seccomp
         Filters based on instruction.

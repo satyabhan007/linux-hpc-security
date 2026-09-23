@@ -16,17 +16,17 @@ More importantly, this lab mimics **real-world systems engineering**. You will e
 
 ```mermaid
 sequenceDiagram
-    participant Attacker (User Space)
-    participant Kernel (VFS / Syscalls)
-    participant eBPF Program (Kernel Space)
-    participant Python Agent (User Space)
-
-    Attacker (User Space)->>Kernel (VFS / Syscalls): Runs `nc -e /bin/bash` (execve syscall)
-    Kernel (VFS / Syscalls)->>eBPF Program (Kernel Space): Tracepoint Triggered (sys_enter_execve)
-    note right of eBPF Program (Kernel Space): eBPF extracts PID, PPID, Command, and Filename
-    eBPF Program (Kernel Space)-->>Python Agent (User Space): Sends struct via BPF_PERF_OUTPUT buffer
-    Python Agent (User Space)->>Python Agent (User Space): Evaluates heuristic ("is this netcat?")
-    Python Agent (User Space)->>Attacker (User Space): Prints 🔴 ALERT to stdout / SIEM
+    participant Attacker as Attacker (User Space)
+    participant Kernel as Kernel (VFS/Syscalls)
+    participant eBPF as eBPF Program
+    participant Python as Python Agent
+    
+    Attacker->>Kernel: Runs nc
+    Kernel->>eBPF: Tracepoint Triggered
+    note right of eBPF: eBPF extracts PID, PPID, Command
+    eBPF-->>Python: Sends struct via buffer
+    Python->>Python: Evaluates heuristic
+    Python->>Attacker: Prints ALERT
 ```
 
 ---
