@@ -39,7 +39,7 @@ jobs:
         run: |
           rm -rf _site_pkg && mkdir -p _site_pkg
           cp index.html 404.html _site_pkg/ 2>/dev/null || true
-          cp README.md LICENSE _site_pkg/ 2>/dev/null || true
+          cp README.md LICENSE CAPSTONE_AUTOSOC.md _site_pkg/ 2>/dev/null || true
           cp -r assets learn learn2 learn3 learn4 learn5 _site_pkg/
           for d in linux hardening stigs benchmarking ebpf ansible warewulf \
                    hpc fabric storage containers tuning \
