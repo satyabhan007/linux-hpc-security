@@ -3,45 +3,64 @@ from bcc import BPF
 import time
 import sys
 
-# 1. The XDP C Program
+# 1. The Bulletproof XDP C Program
+# We manually define the headers to guarantee 100% portability and bypass the Clang fs.h bug!
 bpf_text = """
 #include <uapi/linux/bpf.h>
-in.h>/in.h>
-in.h>/if_ether.h>
-in.h>/ip.h>
+
+#define ETH_P_IP 0x0800
+#define IPPROTO_ICMP 1
+
+// Manually define the Ethernet Header (14 bytes)
+struct ethhdr {
+    unsigned char h_dest[6];
+    unsigned char h_source[6];
+    unsigned short h_proto;
+};
+
+// Manually define the IPv4 Header (20 bytes)
+struct iphdr {
+    unsigned char ihl:4;
+    unsigned char version:4;
+    unsigned char tos;
+    unsigned short tot_len;
+    unsigned short id;
+    unsigned short frag_off;
+    unsigned char ttl;
+    unsigned char protocol;
+    unsigned short check;
+    unsigned int saddr;
+    unsigned int daddr;
+};
 
 // A hash map to keep a running tally of exactly how many packets we drop
 BPF_HASH(drop_cnt, u32, u32);
 
 int xdp_drop_icmp(struct xdp_md *ctx) {
-    // xdp_md provides direct memory pointers to the raw packet bytes on the NIC
     void *data_end = (void *)(long)ctx->data_end;
     void *data = (void *)(long)ctx->data;
 
-    // 1. Parse the Ethernet Header
     struct ethhdr *eth = data;
     
-    // THE VERIFIER: eBPF refuses to compile unless we prove we aren't reading out of bounds!
+    // VERIFIER: Proving we aren't reading out of bounds
     if ((void *)(eth + 1) > data_end) {
         return XDP_PASS;
     }
 
-    // 2. We only care about IPv4 packets (0x0800)
+    // Only inspect IPv4
     if (eth->h_proto != bpf_htons(ETH_P_IP)) {
         return XDP_PASS;
     }
 
-    // 3. Parse the IP Header
     struct iphdr *ip = (void *)(eth + 1);
     
-    // Bounds check the IP header
+    // VERIFIER: Proving the IP header fits in memory
     if ((void *)(ip + 1) > data_end) {
         return XDP_PASS;
     }
 
-    // 4. Is this packet ICMP (Ping)? 
+    // Is this an ICMP (Ping) packet?
     if (ip->protocol == IPPROTO_ICMP) {
-        // It's a ping! Increment our drop counter.
         u32 key = 0;
         u32 *val = drop_cnt.lookup(&key);
         if (val) {
@@ -55,18 +74,14 @@ int xdp_drop_icmp(struct xdp_md *ctx) {
         return XDP_DROP;
     }
 
-    // Allow all other traffic (TCP, UDP, web browsers, SSH, etc.)
     return XDP_PASS;
 }
 """
 
-# 2. Compile and attach to the container's network interface
-print("Compiling XDP program...")
+print("Compiling bulletproof XDP program...")
 b = BPF(text=bpf_text)
 
-# The default network interface inside a Docker container is usually 'eth0'
 interface = "eth0"
-
 print(f"Attaching XDP firewall to {interface}...")
 try:
     fn = b.load_func("xdp_drop_icmp", BPF.XDP)
@@ -88,7 +103,6 @@ try:
         time.sleep(1)
         for k, v in drop_cnt.items():
             print(f"🔥 Incoming Packets Annihilated (XDP_DROP): {v.value}")
-            # Clear the counter so we only show active drops
             drop_cnt.clear()
 except KeyboardInterrupt:
     print("\nRemoving XDP firewall...")
