@@ -933,7 +933,6 @@ client = TypeSafeClient()
 
 <hr class="chapter-divider">
 
-
 <!-- TEST 5 -->
 <section class="section" id="test-5">
     <div class="container">
@@ -1093,6 +1092,84 @@ client = TypeSafeClient()
                 <div class="callout-title">Result: Orchestrating the Swarm</div>
                 <div class="callout-text">By building a Kubernetes Operator in Go, we bridged the gap between raw hardware telemetry (eBPF) and declarative cluster orchestration. When the AI makes a decision, the Go Operator instantly mutates the K8s API object, instantly triggering a strict NetworkPolicy that severs the compromised container's access to the internet. <strong>This is the definition of a Self-Healing Infrastructure.</strong></div>
             </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="chapter-divider">
+
+<section class="section reveal" id="concepts">
+    <div class="container">
+        <h2 class="section-title">Core Concepts & Analogies</h2>
+        <p class="section-subtitle">Understanding the foundational technologies of the autonomous SIEM pipeline.</p>
+
+        <!-- Concept 1 -->
+        <div class="analogy-card reveal">
+            <div class="analogy-header" style="background:var(--blue-dim);color:var(--blue)">🏦 1. eBPF Memory Access (bpf_probe_read)</div>
+            <div class="analogy-body">
+                <strong style="color:var(--text)">The Concept:</strong> Ring 3 (User Space) applications cannot directly access Ring 0 (Kernel) memory. If they try, the OS kills them.<br><br>
+                <strong style="color:var(--text)">The Analogy: The Bank Teller.</strong> You (Ring 3) cannot walk into the bank vault (Ring 0) and just grab the money (data). Instead, eBPF acts as the highly trained Bank Teller. You slide a request under the bulletproof glass, the Teller safely walks into the vault, safely grabs the exact memory pointer using <code class="inline">bpf_probe_read</code>, and slides a copy of the data back to you through the BPF_PERF_OUTPUT ring buffer.<br><br>
+                <strong style="color:var(--text)">Enterprise Practice:</strong> Use this to explain why eBPF observability tools don't crash the server. They are mathematically restricted "tellers" that can only read, never destructively write.
+            </div>
+        </div>
+
+        <!-- Concept 2 -->
+        <div class="analogy-card reveal">
+            <div class="analogy-header" style="background:var(--amber-dim);color:var(--amber)">🛡️ 2. eBPF XDP (eXpress Data Path) DDoS Mitigation</div>
+            <div class="analogy-body">
+                <strong style="color:var(--text)">The Concept:</strong> Traditional firewalls process traffic too late in the networking stack, causing CPU starvation during high-volume attacks.<br><br>
+                <strong style="color:var(--text)">The Analogy: The Nightclub Bouncer.</strong> Standard Linux firewalls (iptables / firewalld) are like letting a violent patron enter a nightclub, giving them a wristband (allocating an <code class="inline">sk_buff</code> memory struct), walking them to the bar, and then checking their ID to kick them out. The overhead is massive. XDP is the bouncer standing out on the street. It intercepts the packet inside the Network Interface Card (NIC) driver and instantly discards it (<code class="inline">XDP_DROP</code>) before it even enters the OS building.<br><br>
+                <strong style="color:var(--text)">Enterprise Practice:</strong> Use this to architect Cloudflare-style edge defenses. You drop Terabit-scale DDoS attacks in hardware, leaving your actual server CPUs resting at 2% utilization.
+            </div>
+        </div>
+
+        <!-- Concept 3 -->
+        <div class="analogy-card reveal">
+            <div class="analogy-header" style="background:var(--purple-dim);color:var(--purple)">🎰 3. TypeSafe AI (System One Determinism)</div>
+            <div class="analogy-body">
+                <strong style="color:var(--text)">The Concept:</strong> Generative LLMs (like ChatGPT) are conversational. If you ask them to make an automated security decision, they might output "I think you should run kill -9", which completely breaks Python parsers and crashes autonomous pipelines.<br><br>
+                <strong style="color:var(--text)">The Analogy: The Slot Machine.</strong> A standard LLM is a novelty 8-ball toy—it gives creative, conversational answers. TypeSafe's Choice primitive is a Slot Machine with only 3 reels (e.g., <code class="inline">KILL_PROCESS</code>, <code class="inline">QUARANTINE</code>, <code class="inline">IGNORE</code>). No matter how complex the eBPF telemetry is, when the AI pulls the lever, it must land on one of those three exact strings. It is mathematically impossible for it to output conversational text.<br><br>
+                <strong style="color:var(--text)">Enterprise Practice:</strong> Use this to explain to management how you are introducing AI into the SOC pipeline without the risk of hallucination. You are turning AI from a chatbot into a deterministic, programmable logic gate.
+            </div>
+        </div>
+
+        <!-- Concept 4 -->
+        <div class="analogy-card reveal">
+            <div class="analogy-header" style="background:var(--green-dim);color:var(--green)">🦠 4. The Kubernetes AutoSOC Operator</div>
+            <div class="analogy-body">
+                <strong style="color:var(--text)">The Concept:</strong> Translating raw machine intelligence into cluster-wide distributed enforcement.<br><br>
+                <strong style="color:var(--text)">The Analogy: The Biological Immune System.</strong><br>
+                • eBPF is the nervous system, instantly detecting the pain of a reverse shell on a single node.<br>
+                • TypeSafe AI is the brain stem, making an instant, deterministic reflex decision to protect the body.<br>
+                • The Go Operator is the white blood cell. It actively watches the bloodstream (Kubernetes API), sees the chemical marker (<code class="inline">security=compromised</code>), and physically isolates the infected cell (<code class="inline">quarantine=true</code>).<br><br>
+                <strong style="color:var(--text)">Enterprise Practice:</strong> This is how you transition a company from "Manual SIEM Alerts" (where tired analysts read dashboards) to "Self-Healing Infrastructure" (where the cluster mitigates the threat in 400 milliseconds, and the analyst reviews the incident on Monday morning).
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="chapter-divider">
+
+<!-- PLAYGROUND -->
+<section class="section reveal" id="playground">
+    <div class="container">
+        <h2 class="section-title">Interactive AI Playground</h2>
+        <p class="section-subtitle">Want to understand the AI primitives powering this swarm? Try our live, in-browser AI playground to learn about neural networks, tokenizers, and attention mechanisms interactively.</p>
+        
+        <div class="card" style="padding:0; overflow:hidden; border:1px solid rgba(56,189,248,0.3); box-shadow:0 0 32px rgba(56,189,248,0.1);">
+            <div style="background:var(--bg-2); padding:12px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700; font-size:0.9rem; color:var(--text); display:flex; align-items:center; gap:8px;">
+                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green);"></span>
+                    Live Playground Environment
+                </span>
+                <a href="https://satyabhan007.github.io/ai-lab/lab/playground.html" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:6px 12px;">Open in New Tab ↗</a>
+            </div>
+            <iframe src="https://satyabhan007.github.io/ai-lab/lab/playground.html" width="100%" height="700px" style="border:none; display:block; background:var(--bg);"></iframe>
+        </div>
+        
+        <div style="text-align:center; margin-top:30px;">
+            <a href="https://satyabhan007.github.io/linux-hpc-security/" class="btn btn-primary" style="padding:12px 24px; font-size:1rem;">← Return to Main Course</a>
         </div>
     </div>
 </section>
