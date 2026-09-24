@@ -1154,23 +1154,119 @@ client = TypeSafeClient()
 <!-- PLAYGROUND -->
 <section class="section reveal" id="playground">
     <div class="container">
-        <h2 class="section-title">Interactive AI Playground</h2>
-        <p class="section-subtitle">Want to understand the AI primitives powering this swarm? Try our live, in-browser AI playground to learn about neural networks, tokenizers, and attention mechanisms interactively.</p>
-        
-        <div class="card" style="padding:0; overflow:hidden; border:1px solid rgba(56,189,248,0.3); box-shadow:0 0 32px rgba(56,189,248,0.1);">
-            <div style="background:var(--bg-2); padding:12px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:700; font-size:0.9rem; color:var(--text); display:flex; align-items:center; gap:8px;">
-                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green);"></span>
-                    Live Playground Environment
-                </span>
-                <a href="https://satyabhan007.github.io/ai-lab/lab/playground.html" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:6px 12px;">Open in New Tab ↗</a>
+        <h2 class="section-title">Interactive Swarm Playground</h2>
+        <p class="section-subtitle">Experiment with the core mechanics of our eBPF and TypeSafe AI pipelines directly in the browser.</p>
+
+        <!-- Explainer Diagram -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-title">How We Reached The Results: The Full Swarm Flow</div>
+            <div class="verifier-flow" style="flex-wrap: wrap;">
+                <div class="vf-step">
+                    <div class="icon" style="color:var(--red)">🔴</div>
+                    <div class="title">1. eBPF Hook (Ring 0)</div>
+                    <div class="desc">Intercepts <code class="inline">sys_enter_execve</code>. Captures PID 442644 executing <code class="inline">nc -e /bin/bash</code>.</div>
+                </div>
+                <div class="vf-arrow">→</div>
+                <div class="vf-step">
+                    <div class="icon" style="color:var(--blue)">🔵</div>
+                    <div class="title">2. Ring Buffer</div>
+                    <div class="desc">Streams kernel structs asynchronously to user-space without locking.</div>
+                </div>
+                <div class="vf-arrow">→</div>
+                <div class="vf-step">
+                    <div class="icon" style="color:var(--purple)">🧠</div>
+                    <div class="title">3. TypeSafe AI</div>
+                    <div class="desc">Evaluates context. Calculates 95% threat probability. Selects <code class="inline">KILL</code> primitive.</div>
+                </div>
+                <div class="vf-arrow">→</div>
+                <div class="vf-step">
+                    <div class="icon" style="color:var(--green)">☸️</div>
+                    <div class="title">4. K8s Operator</div>
+                    <div class="desc">Receives KILL signal. Isolates compromised pod using NetworkPolicies instantly.</div>
+                </div>
             </div>
-            <iframe src="https://satyabhan007.github.io/ai-lab/lab/playground.html" width="100%" height="700px" style="border:none; display:block; background:var(--bg);"></iframe>
         </div>
-        
-        <div style="text-align:center; margin-top:30px;">
-            <a href="https://satyabhan007.github.io/linux-hpc-security/" class="btn btn-primary" style="padding:12px 24px; font-size:1rem;">← Return to Main Course</a>
+
+        <div class="card-grid-2">
+            <!-- Simulator 1: The eBPF Verifier -->
+            <div class="card">
+                <div class="card-title">Simulator: The eBPF Verifier</div>
+                <p class="hint" style="margin-bottom: 15px; font-size: 0.85rem; color: var(--text-muted);">Adjust the kernel memory access slider. User-space programs crash on illegal access. eBPF programs are mathematically proven safe before running.</p>
+                
+                <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">Memory Pointer Offset: <span id="mem-val" style="color:var(--cyan);font-family:var(--mono)">Safe Boundary</span></label>
+                <input type="range" id="mem-slider" min="0" max="100" value="40" style="width:100%; margin-bottom:15px; accent-color:var(--cyan);">
+                
+                <div id="verifier-status" style="background:var(--green-dim); border:1px solid rgba(16,185,129,0.3); padding:12px; border-radius:var(--radius-sm); color:var(--green); font-family:var(--mono); font-size:0.85rem; font-weight:700; text-align:center;">
+                    ✅ VERIFIER PASSED: Program Loaded
+                </div>
+            </div>
+
+            <!-- Simulator 2: TypeSafe AI Engine -->
+            <div class="card">
+                <div class="card-title">Simulator: TypeSafe Determinism</div>
+                <p class="hint" style="margin-bottom: 15px; font-size: 0.85rem; color: var(--text-muted);">Adjust the model's threat probability assessment. Notice how the output is always a hard-coded primitive enum, never conversational text.</p>
+                
+                <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:8px;">AI Threat Probability (Noul): <span id="ai-val" style="color:var(--purple);font-family:var(--mono)">0.45</span></label>
+                <input type="range" id="ai-slider" min="0" max="100" value="45" style="width:100%; margin-bottom:15px; accent-color:var(--purple);">
+                
+                <div id="ai-status" style="background:var(--blue-dim); border:1px solid rgba(59,130,246,0.3); padding:12px; border-radius:var(--radius-sm); color:var(--blue); font-family:var(--mono); font-size:0.85rem; font-weight:700; text-align:center;">
+                    🤖 CHOICE: IGNORE_EVENT
+                </div>
+            </div>
         </div>
+
+        <script>
+            // Verifier Logic
+            const memSlider = document.getElementById('mem-slider');
+            const memVal = document.getElementById('mem-val');
+            const verifierStatus = document.getElementById('verifier-status');
+            
+            memSlider.addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (val > 80) {
+                    memVal.textContent = "Out of Bounds!";
+                    memVal.style.color = "var(--red)";
+                    verifierStatus.style.background = "var(--red-dim)";
+                    verifierStatus.style.borderColor = "rgba(239,68,68,0.3)";
+                    verifierStatus.style.color = "var(--red)";
+                    verifierStatus.innerHTML = "❌ VERIFIER REJECTED: Unsafe Memory Access";
+                } else {
+                    memVal.textContent = "Safe Boundary";
+                    memVal.style.color = "var(--cyan)";
+                    verifierStatus.style.background = "var(--green-dim)";
+                    verifierStatus.style.borderColor = "rgba(16,185,129,0.3)";
+                    verifierStatus.style.color = "var(--green)";
+                    verifierStatus.innerHTML = "✅ VERIFIER PASSED: Program Loaded";
+                }
+            });
+
+            // AI Logic
+            const aiSlider = document.getElementById('ai-slider');
+            const aiVal = document.getElementById('ai-val');
+            const aiStatus = document.getElementById('ai-status');
+
+            aiSlider.addEventListener('input', (e) => {
+                const val = e.target.value / 100;
+                aiVal.textContent = val.toFixed(2);
+                
+                if (val > 0.85) {
+                    aiStatus.style.background = "var(--red-dim)";
+                    aiStatus.style.borderColor = "rgba(239,68,68,0.3)";
+                    aiStatus.style.color = "var(--red)";
+                    aiStatus.innerHTML = "⚡ CHOICE: KILL_PROCESS";
+                } else if (val > 0.60) {
+                    aiStatus.style.background = "var(--amber-dim)";
+                    aiStatus.style.borderColor = "rgba(245,158,11,0.3)";
+                    aiStatus.style.color = "var(--amber)";
+                    aiStatus.innerHTML = "⚠️ CHOICE: QUARANTINE_POD";
+                } else {
+                    aiStatus.style.background = "var(--blue-dim)";
+                    aiStatus.style.borderColor = "rgba(59,130,246,0.3)";
+                    aiStatus.style.color = "var(--blue)";
+                    aiStatus.innerHTML = "🤖 CHOICE: IGNORE_EVENT";
+                }
+            });
+        </script>
     </div>
 </section>
 
