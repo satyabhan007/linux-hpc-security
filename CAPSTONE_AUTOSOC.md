@@ -47,6 +47,41 @@ flowchart TD
 
 Traditional security tools read logs *after* an event happens in User Space (Ring 3). Attackers can easily spoof these logs. **eBPF (Extended Berkeley Packet Filter)** allows us to write C code that executes directly inside the Kernel (Ring 0), making evasion mathematically impossible.
 
+
+> [!TIP]  
+> **The Hardware Latency Profiler:** Before we drop packets, we have to observe them. We wrote an eBPF `BPF_HISTOGRAM` to profile the exact latency of every `read` syscall on the system in real-time, proving the speed difference between RAM (Page Cache) and Disk spin-ups.
+
+<details>
+<summary><b>💻 Click to view the eBPF Hardware Latency Profiler</b></summary>
+
+```python
+bpf_text = """
+#include <uapi/linux/ptrace.h>
+BPF_HASH(start, u32);
+BPF_HISTOGRAM(dist);
+
+int trace_read_entry(struct pt_regs *ctx) {
+    u32 pid = bpf_get_current_pid_tgid();
+    u64 ts = bpf_ktime_get_ns();
+    start.update(&pid, &ts);
+    return 0;
+}
+
+int trace_read_return(struct pt_regs *ctx) {
+    u32 pid = bpf_get_current_pid_tgid();
+    u64 *tsp = start.lookup(&pid);
+    if (tsp != 0) {
+        u64 delta = bpf_ktime_get_ns() - *tsp;
+        dist.increment(bpf_log2l(delta / 1000));
+        start.delete(&pid);
+    }
+    return 0;
+}
+"""
+```
+</details>
+
+
 > [!IMPORTANT]  
 > **The XDP DDoS Firewall:** Instead of relying on iptables, we wrote an eBPF XDP program that intercepts packets directly at the Network Interface Card (NIC). It drops malicious traffic at 10 million packets/second before the Linux OS even allocates memory.
 
