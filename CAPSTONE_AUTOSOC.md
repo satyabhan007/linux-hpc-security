@@ -1,3 +1,8 @@
+---
+layout: default
+title: "Capstone: Autonomous SOC"
+---
+
 # 🚀 Capstone: The Autonomous SOC Architecture
 
 Welcome to the ultimate synthesis of Systems Engineering, Artificial Intelligence, and Kubernetes Orchestration. 
