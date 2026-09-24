@@ -96,7 +96,11 @@ render Warewulf overlay templates, and so on, in a few dozen readable lines.
 ---
 
 
-## 🔥 Featured Capstone: The Autonomous AI Defense Journey
+## 🔥 [Featured Capstone: The Autonomous SOC Architecture](CAPSTONE_AUTOSOC.md)
+
+👉 **[Click here to read the full Interactive Capstone Explainer!](CAPSTONE_AUTOSOC.md)**
+
+It explores the bleeding-edge intersection of **eBPF Kernel Engineering**, **TypeSafe AI**, and **Custom Kubernetes Go Operators**.
 
 This curriculum doesn't just teach traditional systems administration; it explores the bleeding-edge intersection of **eBPF Kernel Engineering** and **TypeSafe AI Orchestration**. 
 
