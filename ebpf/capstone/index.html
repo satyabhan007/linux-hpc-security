@@ -1099,6 +1099,92 @@ client = TypeSafeClient()
 
 <hr class="chapter-divider">
 
+<!-- TEST 7 -->
+<section class="section" id="test-7">
+    <div class="container">
+        <div class="chapter-header reveal">
+            <div class="chapter-tag" style="color:var(--cyan);background:var(--cyan-dim)">Phase 7: The Cognitive Swarm</div>
+            <h2 class="chapter-title">The LangGraph Orchestrator & Graph Database</h2>
+            <p class="chapter-desc">To achieve zero-human-in-the-loop remediation, we replaced the SOC analyst with a multi-agent State Machine. It ingests eBPF alerts, queries a live Neo4j Graph Database for infrastructure context, and routes the data through the TypeSafe AI logic gate.</p>
+        </div>
+
+        <div class="reveal" style="margin: 30px 0;">
+            <details style="background:var(--bg-3); border:1px solid var(--border); border-radius:var(--radius); padding:15px; cursor:pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <summary style="font-weight:700; color:var(--cyan); font-size:1.1rem; outline:none; display:flex; align-items:center; gap:10px;">
+                    <span>🔍 Interactive Playground: Uncover the Blast Radius (Click to Expand)</span>
+                </summary>
+                <div style="margin-top:15px; font-size:0.9rem; color:var(--text-muted); line-height:1.6; padding-top:15px; border-top:1px solid var(--border);">
+                    <p>Before the AI can make a decision, it needs context. In a traditional SOC, an analyst spends 30 minutes manually correlating logs. Our swarm uses <strong>Neo4j</strong> to map the relationships instantly using Cypher graph queries.</p>
+                    <div class="code-block" style="margin-top:10px;">
+                        <div class="code-header">
+                            <div class="code-lang">Cypher — Neo4j Query</div>
+                        </div>
+                        <div class="code-body" style="padding:15px;"><pre style="margin:0;"><span class="tok-comment">// Find the compromised Pod, then find EVERYTHING it is connected to.</span>
+<span class="tok-keyword">MATCH</span> (p:Pod {pid: <span class="tok-number">442644</span>})-[r]-&gt;(asset) 
+<span class="tok-keyword">RETURN</span> p.name <span class="tok-keyword">AS</span> pod, <span class="tok-keyword">type</span>(r) <span class="tok-keyword">AS</span> relation, asset.name <span class="tok-keyword">AS</span> asset_name</pre></div>
+                    </div>
+                    <p style="margin-top:15px; padding:10px; background:rgba(16,185,129,0.1); border-left:3px solid var(--green); color:var(--text);"><strong>Live Graph Result:</strong> <br><code style="color:var(--green); font-family:var(--mono);">Pod 'victim-pod' context: RUNS_ON worker-1, ASSUMES_ROLE S3_Admin_Role, HAS_ACCESS_TO prod-db-credentials</code></p>
+                </div>
+            </details>
+        </div>
+
+        <div class="reveal">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="r"></span><span class="a"></span><span class="g"></span></div>
+                    <div class="code-lang">Python — soc/swarm/swarm_orchestrator.py</div>
+                </div>
+                <div class="code-body"><pre><span class="tok-comment"># Build the LangGraph State Machine</span>
+workflow = StateGraph(SIEMState)
+
+<span class="tok-comment"># Step 1: Query Neo4j for the Graph Context</span>
+workflow.add_node(<span class="tok-string">"enrich_context"</span>, enrich_context)
+
+<span class="tok-comment"># Step 2: Hand the context + eBPF telemetry to the TypeSafe AI Governor</span>
+workflow.add_node(<span class="tok-string">"evaluate_threat"</span>, evaluate_threat)
+
+<span class="tok-comment"># Step 3: Trigger the Go Operator to rewrite Kubernetes NetworkPolicies</span>
+workflow.add_node(<span class="tok-string">"execute_remediation"</span>, execute_remediation)
+
+<span class="tok-comment"># Dynamic conditional routing based on AI probability</span>
+workflow.set_entry_point(<span class="tok-string">"enrich_context"</span>)
+workflow.add_edge(<span class="tok-string">"enrich_context"</span>, <span class="tok-string">"evaluate_threat"</span>)
+
+<span class="tok-comment"># If the AI outputs 'QUARANTINE_POD', execute remediation. Otherwise, END.</span>
+workflow.add_conditional_edges(<span class="tok-string">"evaluate_threat"</span>, route_action, {<span class="tok-string">"execute_remediation"</span>: <span class="tok-string">"execute_remediation"</span>, <span class="tok-string">"end"</span>: END})</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="reveal">
+            <div class="terminal" style="margin-top:20px">
+                <div class="terminal-bar">
+                    <span class="tdot" style="background:#ef4444"></span>
+                    <span class="tdot" style="background:#f59e0b"></span>
+                    <span class="tdot" style="background:#10b981"></span>
+                    <div class="terminal-title">~/linux-hpc-security/soc/swarm — python3 swarm_orchestrator.py</div>
+                </div>
+                <div class="terminal-body"><pre><span class="t-prompt">$</span> <span class="t-cmd">python3 swarm_orchestrator.py</span>
+<span class="t-success">🚀 Initiating LangGraph Autonomous SIEM Swarm...</span>
+
+<span class="t-info">[Node 1: Neo4j Graph DB] Querying cluster context for blast radius...</span>
+<span class="t-threat">   -&gt; Graph Result: Pod 'victim-pod' context: RUNS_ON worker-1, ASSUMES_ROLE S3_Admin_Role, HAS_ACCESS_TO prod-db-credentials</span>
+
+<span class="t-info">[Node 2: TypeSafe AI] Evaluating eBPF telemetry + Neo4j context...</span>
+<span class="t-success">   -&gt; Threat Probability: 89.0%</span>
+<span class="t-success">   -&gt; Chosen Action: QUARANTINE_POD</span>
+
+<span class="t-info">[Node 3: K8s Python Client] Triggering AutoSOC Go Operator...</span>
+<span class="t-dim">   -&gt; Patching Kubernetes API: Labeling 'victim-pod' with 'security=compromised'</span>
+<span class="t-success">   -&gt; Success! The Kubernetes Go Operator will now detect this label and sever network access.</span></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="chapter-divider">
+
 <section class="section reveal" id="concepts">
     <div class="container">
         <h2 class="section-title">Core Concepts & Analogies</h2>
