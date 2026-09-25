@@ -259,32 +259,100 @@
 </head>
 <body>
 
+<!-- Add two-row nav CSS inline (supplements comfy.css) -->
+<style>
+.top-nav-cap {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(19,17,16,0.96);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+}
+.tnc-row1 {
+  display: flex; align-items: center; padding: 0 24px; height: 46px;
+  border-bottom: 1px solid rgba(255,243,220,0.05); gap: 0;
+}
+.tnc-brand {
+  display: flex; align-items: center; gap: 8px; text-decoration: none;
+  flex-shrink: 0; padding-right: 18px; border-right: 1px solid var(--border); margin-right: 12px;
+}
+.tnc-brand:hover { text-decoration: none; }
+.tnc-brand .logo { font-size: 1.2rem; }
+.tnc-brand .name { font-weight: 700; font-size: 12.5px; color: var(--text); }
+.tnc-brand .sub  { font-size: 9.5px; color: var(--text-dim); }
+.tnc-title { flex: 1; font-size: 11.5px; font-weight: 700; color: var(--text-muted); padding-left: 4px; }
+.tnc-actions { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.tnc-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 700;
+  text-decoration: none; border: 1px solid var(--border-soft);
+  color: var(--text-dim); background: transparent;
+  transition: all 0.2s; white-space: nowrap; font-family: var(--font); cursor: pointer;
+}
+.tnc-btn:hover { color: var(--amber); border-color: rgba(251,191,36,0.4); text-decoration: none; }
+.tnc-btn.primary { background: var(--amber); color: #1a1409; border-color: var(--amber); }
+.tnc-btn.primary:hover { background: #fb923c; border-color: #fb923c; color: #1a1409; }
+.tnc-btn.play { background: rgba(74,222,128,0.12); color: var(--green); border-color: rgba(74,222,128,0.3); }
+.tnc-btn.play:hover { background: var(--green); color: #0a1f10; }
+.tnc-row2 {
+  display: flex; align-items: stretch; overflow-x: auto;
+  padding: 0 24px; height: 36px; gap: 0;
+}
+.tnc-row2::-webkit-scrollbar { height: 0; }
+.tnc-link {
+  display: flex; align-items: center; padding: 0 13px;
+  font-size: 11.5px; font-weight: 600; color: var(--text-dim);
+  text-decoration: none; border-bottom: 2px solid transparent;
+  white-space: nowrap; transition: color 0.15s, border-color 0.15s;
+  cursor: pointer; letter-spacing: 0.01em;
+}
+.tnc-link:hover { color: var(--text-muted); text-decoration: none; }
+.tnc-link.active { color: var(--amber); border-bottom-color: var(--amber); }
+.tnc-sep { width: 1px; background: var(--border); margin: 8px 3px; flex-shrink: 0; }
+@media (max-width: 768px) {
+  .tnc-brand .sub { display: none; }
+  .tnc-title { display: none; }
+  .tnc-row2 { padding: 0 12px; }
+}
+</style>
+
 <!-- HEADER -->
-<header class="site-header">
-    <div class="nav-container">
-        <a href="https://satyabhan007.github.io/linux-hpc-security/" class="brand" style="text-decoration:none;">
-            <div class="brand-logo">🐧</div>
-            <div>
-                <div class="brand-text">linux-hpc-security</div>
-                <div class="brand-sub">Systems Engineering from the Metal Up</div>
-            </div>
-        </a>
-        <nav class="nav-links">
-            <a href="#test-1">Test 1: Detector</a>
-            <a href="#test-2">Test 2: Verifier</a>
-            <a href="#test-3">Test 3: Profiler</a>
-            <a href="#test-4">Test 4: TypeSafe AI</a>
-            <a href="#architecture">Architecture</a>
-        </nav>
-        <div class="nav-actions">
-            <a href="https://satyabhan007.github.io/linux-hpc-security/" class="btn btn-outline">← Course Home</a>
-            <a href="https://github.com/satyabhan007/linux-hpc-security/tree/main/ebpf" class="btn btn-primary" target="_blank" rel="noopener">View Source</a>
-        </div>
+<header class="top-nav-cap" id="capstoneNav">
+  <!-- Row 1: Brand + title + actions -->
+  <div class="tnc-row1">
+    <a href="https://satyabhan007.github.io/linux-hpc-security/" class="tnc-brand">
+      <span class="logo">🐧</span>
+      <div>
+        <div class="name">linux-hpc-security</div>
+        <div class="sub">Systems Engineering from the Metal Up</div>
+      </div>
+    </a>
+    <div class="tnc-title">Autonomous SIEM Capstone — eBPF + TypeSafe AI</div>
+    <div class="tnc-actions">
+      <a href="https://satyabhan007.github.io/linux-hpc-security/" class="tnc-btn">🏠 Course</a>
+      <a href="./playground.html" class="tnc-btn play">🎮 Playground</a>
+      <a href="https://github.com/satyabhan007/linux-hpc-security/tree/main/ebpf" class="tnc-btn primary" target="_blank" rel="noopener">⟨/⟩ Source</a>
     </div>
+  </div>
+  <!-- Row 2: Section jump links -->
+  <div class="tnc-row2" id="capNavRow2">
+    <a class="tnc-link active" href="#hero"       data-sec="hero">🏠 Overview</a>
+    <div class="tnc-sep"></div>
+    <a class="tnc-link" href="#architecture" data-sec="architecture">📐 Architecture</a>
+    <a class="tnc-link" href="#test-1"       data-sec="test-1">🔴 Test 1: Detector</a>
+    <a class="tnc-link" href="#test-2"       data-sec="test-2">🛡️ Test 2: Verifier</a>
+    <a class="tnc-link" href="#test-3"       data-sec="test-3">📊 Test 3: Profiler</a>
+    <a class="tnc-link" href="#test-4"       data-sec="test-4">🧠 Test 4: TypeSafe AI</a>
+    <a class="tnc-link" href="#test-5"       data-sec="test-5">⚡ Test 5</a>
+    <a class="tnc-link" href="#test-6"       data-sec="test-6">☸️ Test 6</a>
+    <a class="tnc-link" href="#test-7"       data-sec="test-7">🔒 Test 7</a>
+    <div class="tnc-sep"></div>
+    <a class="tnc-link" href="#concepts"     data-sec="concepts">📚 Concepts</a>
+    <a class="tnc-link" href="#playground"   data-sec="playground">🎮 Playground</a>
+  </div>
 </header>
 
 <!-- HERO -->
-<section class="hero">
+<section class="hero" id="hero" style="scroll-margin-top:84px;">
     <div class="container">
         <div class="hero-badge hero-anim" style="animation-delay:0.1s">
             <span class="dot"></span>
@@ -339,7 +407,7 @@
 </section>
 
 <!-- ARCHITECTURE -->
-<section class="section reveal" id="architecture">
+<section class="section reveal" id="architecture" style="scroll-margin-top:84px;">
     <div class="container">
         <h2 class="section-title">The Architecture: From the Metal to the AI Brain</h2>
         <p class="section-subtitle">A complete autonomous security pipeline. Data flows through three strict privilege boundaries — kernel hardware (Ring 0), user-space agent (Ring 3), and an AI decision engine — all without a human in the loop.</p>
@@ -389,7 +457,7 @@
 <hr class="chapter-divider">
 
 <!-- TEST 1 -->
-<section class="section" id="test-1">
+<section class="section" id="test-1" style="scroll-margin-top:84px;">
     <div class="container">
         <div class="chapter-header reveal">
             <div class="chapter-number" style="background:var(--red-dim);color:var(--red)">01</div>
@@ -526,7 +594,7 @@
 <hr class="chapter-divider">
 
 <!-- TEST 2 -->
-<section class="section" id="test-2">
+<section class="section" id="test-2" style="scroll-margin-top:84px;">
     <div class="container">
         <div class="chapter-header reveal">
             <div class="chapter-number" style="background:var(--amber-dim);color:var(--amber)">02</div>
@@ -654,7 +722,7 @@
 <hr class="chapter-divider">
 
 <!-- TEST 3 -->
-<section class="section" id="test-3">
+<section class="section" id="test-3" style="scroll-margin-top:84px;">
     <div class="container">
         <div class="chapter-header reveal">
             <div class="chapter-number" style="background:var(--cyan-dim);color:var(--cyan)">03</div>
@@ -797,7 +865,7 @@
 <hr class="chapter-divider">
 
 <!-- TEST 4 -->
-<section class="section" id="test-4">
+<section class="section" id="test-4" style="scroll-margin-top:84px;">
     <div class="container">
         <div class="chapter-header reveal">
             <div class="chapter-number" style="background:var(--purple-dim);color:var(--purple)">04</div>
@@ -956,7 +1024,7 @@ client = TypeSafeClient()
 <hr class="chapter-divider">
 
 <!-- TEST 5 -->
-<section class="section" id="test-5">
+<section class="section" id="test-5" style="scroll-margin-top:84px;">
     <div class="container">
         <div class="chapter-header reveal">
             <div class="chapter-tag" style="color:var(--amber);background:var(--amber-dim)">Phase 5: The Edge Firewall</div>
@@ -1035,7 +1103,7 @@ client = TypeSafeClient()
 <hr class="chapter-divider">
 
 <!-- TEST 6 -->
-<section class="section" id="test-6">
+<section class="section" id="test-6" style="scroll-margin-top:84px;">
     <div class="container">
         <div class="chapter-header reveal">
             <div class="chapter-tag" style="color:var(--blue);background:var(--blue-dim)">Phase 6: The Kubernetes Orchestrator</div>
@@ -1122,7 +1190,7 @@ client = TypeSafeClient()
 <hr class="chapter-divider">
 
 <!-- TEST 7 -->
-<section class="section" id="test-7">
+<section class="section" id="test-7" style="scroll-margin-top:84px;">
     <div class="container">
         <div class="chapter-header reveal">
             <div class="chapter-tag" style="color:var(--cyan);background:var(--cyan-dim)">Phase 7: The Cognitive Swarm</div>
@@ -1207,7 +1275,7 @@ workflow.add_conditional_edges(<span class="tok-string">"evaluate_threat"</span>
 
 <hr class="chapter-divider">
 
-<section class="section reveal" id="concepts">
+<section class="section reveal" id="concepts" style="scroll-margin-top:84px;">
     <div class="container">
         <h2 class="section-title">Core Concepts & Analogies</h2>
         <p class="section-subtitle">Understanding the foundational technologies of the autonomous SIEM pipeline.</p>
@@ -1260,7 +1328,7 @@ workflow.add_conditional_edges(<span class="tok-string">"evaluate_threat"</span>
 <hr class="chapter-divider">
 
 <!-- PLAYGROUND -->
-<section class="section reveal" id="playground">
+<section class="section reveal" id="playground" style="scroll-margin-top:84px;">
     <div class="container">
         <h2 class="section-title">Interactive Swarm Playground</h2>
         <p class="section-subtitle">Experiment with the core mechanics of our eBPF and TypeSafe AI pipelines directly in the browser.</p>
@@ -1475,19 +1543,40 @@ workflow.add_conditional_edges(<span class="tok-string">"evaluate_threat"</span>
     }, { threshold: 0.4 });
     document.querySelectorAll('.ai-result-panel').forEach(el => barObs.observe(el));
 
-    // Active nav
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
-    const navObs = new IntersectionObserver(entries => {
+    // ── Two-row nav: scroll-spy ──
+    const capSections = document.querySelectorAll('section[id], .hero[id]');
+    const capNavLinks = document.querySelectorAll('.tnc-link');
+    const capNavObs = new IntersectionObserver(entries => {
         entries.forEach(e => {
             if (e.isIntersecting) {
-                navLinks.forEach(a => a.classList.remove('active'));
-                const m = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
-                if (m) m.classList.add('active');
+                capNavLinks.forEach(a => a.classList.remove('active'));
+                const match = document.querySelector(`.tnc-link[data-sec="${e.target.id}"]`);
+                if (match) {
+                    match.classList.add('active');
+                    match.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+                }
             }
         });
-    }, { threshold: 0.45 });
-    sections.forEach(s => navObs.observe(s));
+    }, { threshold: 0.15, rootMargin: '-82px 0px -40% 0px' });
+    capSections.forEach(s => capNavObs.observe(s));
+
+    // ── Two-row nav: click → smooth scroll ──
+    capNavLinks.forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            const target = document.querySelector(link.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    // ── Keyboard: ← → navigate sections ──
+    document.addEventListener('keydown', ev => {
+        if (['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+        const links  = [...capNavLinks];
+        const active = links.findIndex(l => l.classList.contains('active'));
+        if (ev.key === 'ArrowRight' && active < links.length - 1) links[active + 1].click();
+        if (ev.key === 'ArrowLeft'  && active > 0)                links[active - 1].click();
+    });
 </script>
 </body>
 </html>

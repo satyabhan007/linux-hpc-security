@@ -126,14 +126,145 @@
     }
     footer a { color: var(--amber); }
 
+    /* ── Top Sticky Navbar ── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(19,17,16,0.95);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+    .top-nav-row1 {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 24px;
+      height: 46px;
+      border-bottom: 1px solid rgba(255,243,220,0.05);
+    }
+    .top-nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      flex-shrink: 0;
+      padding-right: 18px;
+      border-right: 1px solid var(--border);
+      margin-right: 14px;
+    }
+    .top-nav-brand:hover { text-decoration: none; }
+    .top-nav-brand .logo { font-size: 1.2rem; }
+    .top-nav-brand .name { font-weight: 700; font-size: 12.5px; color: var(--text); }
+    .top-nav-brand .sub  { font-size: 9.5px; color: var(--text-dim); }
+    .xp-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+    .xp-inline-lbl { font-size: 10px; color: var(--text-dim); font-weight: 700; white-space: nowrap; }
+    .xp-inline-track {
+      flex: 1;
+      min-width: 60px;
+      max-width: 200px;
+      height: 5px;
+      background: var(--bg-4);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .xp-inline-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--amber), var(--orange));
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.7s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .xp-inline-text { font-size: 10px; color: var(--text-dim); font-family: var(--mono); white-space: nowrap; }
+    .xp-badges-row { display: flex; gap: 4px; }
+    .top-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+      padding-left: 14px;
+    }
+    .top-nav-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid var(--border-soft);
+      color: var(--text-dim);
+      background: transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .top-nav-action-btn:hover { color: var(--amber); border-color: rgba(251,191,36,0.4); text-decoration: none; }
+    .top-nav-action-btn.primary { background: var(--amber); color: #1a1409; border-color: var(--amber); }
+    .top-nav-action-btn.primary:hover { background: var(--orange); border-color: var(--orange); color: #1a1409; }
+    /* Row 2 — section links */
+    .top-nav-row2 {
+      display: flex;
+      align-items: stretch;
+      overflow-x: auto;
+      padding: 0 24px;
+      gap: 0;
+      height: 38px;
+    }
+    .top-nav-row2::-webkit-scrollbar { height: 0; }
+    .nav-section-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 14px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color 0.18s, border-color 0.18s;
+      cursor: pointer;
+      position: relative;
+      letter-spacing: 0.015em;
+    }
+    .nav-section-link:hover { color: var(--text-muted); text-decoration: none; }
+    .nav-section-link.active { color: var(--amber); border-bottom-color: var(--amber); }
+    .nav-section-link .ns-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 99px;
+      background: rgba(74,222,128,0.12);
+      color: var(--green);
+      border: 1px solid rgba(74,222,128,0.2);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .nav-section-link.done .ns-badge { opacity: 1; }
+    .nav-sep { width: 1px; background: var(--border); margin: 8px 2px; flex-shrink: 0; }
+
     @media (max-width: 700px) {
       main { grid-template-columns: 1fr; padding: 16px; }
       .scenario-grid { grid-template-columns: 1fr 1fr; }
+      .top-nav-brand .sub { display: none; }
+      .xp-inline-track { max-width: 80px; }
+      .top-nav-actions { gap: 4px; }
     }
   </style>
 </head>
 <body>
 
+<!-- HERO -->
 <header>
   <div class="hero">
     <div class="hero-inner">
@@ -145,37 +276,70 @@
         <div class="hero-stat">🔴 Ring 0 → 🔵 Ring 3 → 🧠 TypeSafe → ☸️ K8s</div>
         <div class="hero-stat">⚡ 6 Labs · 8 Quiz questions · 7 Badges</div>
       </div>
-      <a href="./index.html" class="hero-back">← Back to Capstone Write-up</a>
     </div>
   </div>
 </header>
 
-<!-- XP BAR -->
-<div class="comfy-xp-bar">
-  <span class="comfy-xp-lbl">🏆 XP</span>
-  <div class="comfy-xp-track"><div class="comfy-xp-fill" id="xpFill"></div></div>
-  <span class="comfy-xp-lbl" id="xpText">0 / 600</span>
-  <div class="comfy-xp-badges">
-    <span class="comfy-xbadge" data-xp="50"  title="First Syscall Intercepted">🔴</span>
-    <span class="comfy-xbadge" data-xp="120" title="Verifier Defender">🛡️</span>
-    <span class="comfy-xbadge" data-xp="200" title="Ring Buffer Engineer">🔵</span>
-    <span class="comfy-xbadge" data-xp="300" title="TypeSafe Operator">🧠</span>
-    <span class="comfy-xbadge" data-xp="420" title="XDP Firewall Architect">🔥</span>
-    <span class="comfy-xbadge" data-xp="550" title="AutoSOC Engineer">☸️</span>
-    <span class="comfy-xbadge" data-xp="600" title="Autonomous SIEM Graduate">🎓</span>
+<!-- ═══ STICKY NAVBAR ═══ -->
+<nav class="top-nav" id="topNav">
+  <!-- Row 1: Brand + XP inline + Actions -->
+  <div class="top-nav-row1">
+    <a href="./index.html" class="top-nav-brand" title="Back to Capstone">
+      <span class="logo">🐧</span>
+      <div>
+        <div class="name">eBPF Playground</div>
+        <div class="sub">linux-hpc-security</div>
+      </div>
+    </a>
+    <div class="xp-inline">
+      <span class="xp-inline-lbl">🏆 XP</span>
+      <div class="xp-inline-track"><div class="xp-inline-fill" id="xpFill"></div></div>
+      <span class="xp-inline-text" id="xpText">0 / 600</span>
+      <div class="xp-badges-row">
+        <span class="comfy-xbadge" data-xp="50"  title="First Syscall">🔴</span>
+        <span class="comfy-xbadge" data-xp="120" title="Verifier Defender">🛡️</span>
+        <span class="comfy-xbadge" data-xp="200" title="Ring Buffer Eng">🔵</span>
+        <span class="comfy-xbadge" data-xp="300" title="TypeSafe Operator">🧠</span>
+        <span class="comfy-xbadge" data-xp="420" title="XDP Architect">🔥</span>
+        <span class="comfy-xbadge" data-xp="550" title="AutoSOC Eng">☸️</span>
+        <span class="comfy-xbadge" data-xp="600" title="SIEM Graduate">🎓</span>
+      </div>
+    </div>
+    <div class="top-nav-actions">
+      <a href="./index.html" class="top-nav-action-btn">← Capstone</a>
+      <a href="https://satyabhan007.github.io/linux-hpc-security/" class="top-nav-action-btn">🏠 Course</a>
+      <a href="https://github.com/satyabhan007/linux-hpc-security/tree/main/ebpf" class="top-nav-action-btn primary" target="_blank" rel="noopener">⟨/⟩ Source</a>
+    </div>
   </div>
-</div>
-
-<!-- NAV TABS -->
-<nav class="comfy-nav-tabs" id="navTabs">
-  <div class="comfy-nav-tab active" data-target="sec-overview">🗺️ Overview</div>
-  <div class="comfy-nav-tab" data-target="sec-syscall">🔴 Syscall</div>
-  <div class="comfy-nav-tab" data-target="sec-verifier">🛡️ Verifier</div>
-  <div class="comfy-nav-tab" data-target="sec-ringbuf">🔵 Ring Buffer</div>
-  <div class="comfy-nav-tab" data-target="sec-typesafe">🧠 TypeSafe AI</div>
-  <div class="comfy-nav-tab" data-target="sec-xdp">🔥 XDP</div>
-  <div class="comfy-nav-tab" data-target="sec-autosoc">☸️ AutoSOC</div>
-  <div class="comfy-nav-tab" data-target="sec-quiz">🎓 Quiz</div>
+  <!-- Row 2: Section jump links -->
+  <div class="top-nav-row2" id="navRow2">
+    <a class="nav-section-link active" href="#sec-overview" data-section="sec-overview">
+      🗺️ Overview
+    </a>
+    <div class="nav-sep"></div>
+    <a class="nav-section-link" href="#sec-syscall" data-section="sec-syscall" id="nl-syscall">
+      🔴 Lab 1 — Syscall <span class="ns-badge">✓</span>
+    </a>
+    <a class="nav-section-link" href="#sec-verifier" data-section="sec-verifier" id="nl-verifier">
+      🛡️ Lab 2 — Verifier <span class="ns-badge">✓</span>
+    </a>
+    <a class="nav-section-link" href="#sec-ringbuf" data-section="sec-ringbuf" id="nl-ringbuf">
+      🔵 Lab 3 — Ring Buffer <span class="ns-badge">✓</span>
+    </a>
+    <a class="nav-section-link" href="#sec-typesafe" data-section="sec-typesafe" id="nl-typesafe">
+      🧠 Lab 4 — TypeSafe AI <span class="ns-badge">✓</span>
+    </a>
+    <a class="nav-section-link" href="#sec-xdp" data-section="sec-xdp" id="nl-xdp">
+      🔥 Lab 5 — XDP <span class="ns-badge">✓</span>
+    </a>
+    <a class="nav-section-link" href="#sec-autosoc" data-section="sec-autosoc" id="nl-autosoc">
+      ☸️ Lab 6 — AutoSOC <span class="ns-badge">✓</span>
+    </a>
+    <div class="nav-sep"></div>
+    <a class="nav-section-link" href="#sec-quiz" data-section="sec-quiz" id="nl-quiz">
+      🎓 Quiz <span class="ns-badge">✓</span>
+    </a>
+  </div>
 </nav>
 
 <main>
@@ -198,7 +362,7 @@
 </div>
 
 <!-- ═══ OVERVIEW ═══ -->
-<div class="comfy-card full lazy-reveal" id="sec-overview">
+<div class="comfy-card full lazy-reveal" id="sec-overview" style="scroll-margin-top: 90px;">
   <div class="card-title">🗺️ The Autonomous SIEM Pipeline — What You Are Building</div>
   <p class="card-hint">Each lab corresponds to a real stage in our capstone. A reverse shell detected at Ring 0 becomes an autonomous cluster-wide quarantine in 400ms — zero human in the loop. Animate it below.</p>
   <div class="comfy-pipeline" id="overview-pipeline">
@@ -224,7 +388,7 @@
 </div>
 
 <!-- ═══ LAB 1 — SYSCALL ═══ -->
-<div class="sec-hdr lazy-reveal" id="sec-syscall">
+<div class="sec-hdr lazy-reveal" id="sec-syscall" style="scroll-margin-top: 90px;">
   <h3>🔴 Lab 1 — Syscall Interceptor · Ring 0 eBPF</h3>
   <div class="sec-hdr-line"></div>
 </div>
@@ -261,7 +425,7 @@
 </div>
 
 <!-- ═══ LAB 2 — VERIFIER ═══ -->
-<div class="sec-hdr lazy-reveal" id="sec-verifier">
+<div class="sec-hdr lazy-reveal" id="sec-verifier" style="scroll-margin-top: 90px;">
   <h3>🛡️ Lab 2 — eBPF Verifier · Mathematical Safety</h3>
   <div class="sec-hdr-line"></div>
 </div>
@@ -315,7 +479,7 @@
 </div>
 
 <!-- ═══ LAB 3 — RING BUFFER ═══ -->
-<div class="sec-hdr lazy-reveal" id="sec-ringbuf">
+<div class="sec-hdr lazy-reveal" id="sec-ringbuf" style="scroll-margin-top: 90px;">
   <h3>🔵 Lab 3 — BPF Ring Buffer · Zero-Copy Data Path</h3>
   <div class="sec-hdr-line"></div>
 </div>
@@ -348,7 +512,7 @@
 </div>
 
 <!-- ═══ LAB 4 — TYPESAFE AI ═══ -->
-<div class="sec-hdr lazy-reveal" id="sec-typesafe">
+<div class="sec-hdr lazy-reveal" id="sec-typesafe" style="scroll-margin-top: 90px;">
   <h3>🧠 Lab 4 — TypeSafe AI Decision Engine</h3>
   <div class="sec-hdr-line"></div>
 </div>
@@ -411,7 +575,7 @@
 </div>
 
 <!-- ═══ LAB 5 — XDP ═══ -->
-<div class="sec-hdr lazy-reveal" id="sec-xdp">
+<div class="sec-hdr lazy-reveal" id="sec-xdp" style="scroll-margin-top: 90px;">
   <h3>🔥 Lab 5 — XDP Firewall · Hardware-Speed DDoS Defense</h3>
   <div class="sec-hdr-line"></div>
 </div>
@@ -449,7 +613,7 @@
 </div>
 
 <!-- ═══ LAB 6 — K8S AUTOSOC ═══ -->
-<div class="sec-hdr lazy-reveal" id="sec-autosoc">
+<div class="sec-hdr lazy-reveal" id="sec-autosoc" style="scroll-margin-top: 90px;">
   <h3>☸️ Lab 6 — Kubernetes AutoSOC Operator</h3>
   <div class="sec-hdr-line"></div>
 </div>
@@ -485,7 +649,7 @@
 </div>
 
 <!-- ═══ QUIZ ═══ -->
-<div class="sec-hdr lazy-reveal" id="sec-quiz">
+<div class="sec-hdr lazy-reveal" id="sec-quiz" style="scroll-margin-top: 90px;">
   <h3>🎓 SOC Engineer Quiz · Test Your Knowledge</h3>
   <div class="sec-hdr-line"></div>
 </div>
@@ -550,21 +714,45 @@ function showToast(msg) {
   document.body.appendChild(t); setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(20px)'; setTimeout(()=>t.remove(),400); }, 2600);
 }
 
-// ─── PROGRESS TRACKER ───
+// ─── PROGRESS TRACKER + NAV BADGE ───
+const LAB_NAV_MAP = {1:'nl-syscall',2:'nl-verifier',3:'nl-ringbuf',4:'nl-typesafe',5:'nl-xdp',6:'nl-autosoc',7:'nl-quiz'};
 function markDone(n) {
   labsDone.add(n);
-  const el = document.getElementById('ps-' + n); if(el) el.classList.add('done');
+  // Progress steps
+  const el  = document.getElementById('ps-' + n);      if(el)  el.classList.add('done');
   const sep = document.getElementById('psp-' + (n-1)); if(sep) sep.classList.add('done');
-  // Mark next active
-  const next = document.getElementById('ps-' + (n+1)); if(next && !next.classList.contains('done')) next.classList.add('active');
+  const nxt = document.getElementById('ps-' + (n+1));  if(nxt && !nxt.classList.contains('done')) nxt.classList.add('active');
+  // Nav link green ✓ badge
+  const nlId = LAB_NAV_MAP[n];
+  if (nlId) document.getElementById(nlId)?.classList.add('done');
 }
 
-// ─── NAV TABS ───
-document.querySelectorAll('.comfy-nav-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.comfy-nav-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const el = document.getElementById(tab.dataset.target);
+// ─── SCROLL-SPY: highlight nav link for visible section ───
+const SECTION_IDS = ['sec-overview','sec-syscall','sec-verifier','sec-ringbuf','sec-typesafe','sec-xdp','sec-autosoc','sec-quiz'];
+const scrollSpyObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.nav-section-link').forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`.nav-section-link[data-section="${e.target.id}"]`);
+      if (active) {
+        active.classList.add('active');
+        // Auto-scroll the nav row so active link is visible
+        active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+    }
+  });
+}, { threshold: 0.18, rootMargin: '-84px 0px -40% 0px' });
+SECTION_IDS.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) scrollSpyObs.observe(el);
+});
+
+// ─── NAV LINK CLICK → smooth scroll ───
+document.querySelectorAll('.nav-section-link').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const targetId = link.getAttribute('data-section');
+    const el = document.getElementById(targetId);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
@@ -924,18 +1112,17 @@ function answerQuiz(qi,oi){
 }
 renderQuiz();
 
-// ─── KEYBOARD SHORTCUTS ───
+// ─── KEYBOARD SHORTCUTS (← → navigate sections) ───
 document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight') {
-    const tabs = [...document.querySelectorAll('.comfy-nav-tab')];
-    const active = tabs.findIndex(t=>t.classList.contains('active'));
-    if (active < tabs.length-1) tabs[active+1].click();
-  }
-  if (e.key === 'ArrowLeft') {
-    const tabs = [...document.querySelectorAll('.comfy-nav-tab')];
-    const active = tabs.findIndex(t=>t.classList.contains('active'));
-    if (active > 0) tabs[active-1].click();
-  }
+  // Skip if user is typing in an input
+  if (['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  const links  = [...document.querySelectorAll('.nav-section-link')];
+  const active = links.findIndex(l => l.classList.contains('active'));
+  if (e.key === 'ArrowRight' && active < links.length - 1) links[active + 1].click();
+  if (e.key === 'ArrowLeft'  && active > 0)                links[active - 1].click();
+  // Number keys 1-8 jump to sections
+  const num = parseInt(e.key);
+  if (num >= 1 && num <= 8 && !e.ctrlKey && !e.metaKey) links[num - 1]?.click();
 });
 </script>
 </body>
