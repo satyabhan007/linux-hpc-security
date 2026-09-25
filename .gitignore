@@ -3,3 +3,4 @@ __pycache__/
 _site_pkg/
 .DS_Store
 *.swp
+.env
