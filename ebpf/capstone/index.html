@@ -9,22 +9,28 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐧</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap">
+    <!-- Lazy-load fonts after paint -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"></noscript>
+    <!-- Comfy design system -->
+    <link rel="stylesheet" href="../../assets/css/comfy.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --bg: #0a0e1a; --bg-2: #0f1629; --bg-3: #151d35; --bg-4: #1a2340;
-            --border: rgba(255,255,255,0.07); --border-bright: rgba(255,255,255,0.12);
-            --text: #e2e8f0; --text-muted: #94a3b8; --text-dim: #64748b;
-            --green: #10b981; --green-dim: rgba(16,185,129,0.12); --green-glow: rgba(16,185,129,0.35);
-            --cyan: #22d3ee; --cyan-dim: rgba(34,211,238,0.1);
-            --purple: #a855f7; --purple-dim: rgba(168,85,247,0.12);
-            --red: #ef4444; --red-dim: rgba(239,68,68,0.12);
-            --amber: #f59e0b; --amber-dim: rgba(245,158,11,0.12);
-            --blue: #3b82f6; --blue-dim: rgba(59,130,246,0.12);
+            /* Comfy warm dark palette */
+            --bg: #131110; --bg-2: #1a1815; --bg-3: #211e1b; --bg-4: #2a2622;
+            --border: rgba(255,243,220,0.07); --border-bright: rgba(255,243,220,0.12);
+            --text: #f0ebe3; --text-muted: #9e9690; --text-dim: #635f59;
+            /* Warm accent overrides */
+            --green: #4ade80; --green-dim: rgba(74,222,128,0.10); --green-glow: rgba(74,222,128,0.30);
+            --cyan: #2dd4bf; --cyan-dim: rgba(45,212,191,0.10);
+            --purple: #c084fc; --purple-dim: rgba(192,132,252,0.12);
+            --red: #f87171; --red-dim: rgba(248,113,113,0.12);
+            --amber: #fbbf24; --amber-dim: rgba(251,191,36,0.12);
+            --blue: #60a5fa; --blue-dim: rgba(96,165,250,0.12);
             --font: 'Inter', system-ui, sans-serif;
             --mono: 'JetBrains Mono', 'Fira Code', monospace;
-            --radius: 12px; --radius-sm: 8px; --radius-lg: 16px;
+            --radius: 14px; --radius-sm: 9px; --radius-lg: 20px;
         }
         html { scroll-behavior: smooth; }
         body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.7; overflow-x: hidden; }
@@ -211,11 +217,27 @@
         .footer-links a { font-size:0.8rem; color:var(--text-muted); text-decoration:none; transition:color 0.2s; }
         .footer-links a:hover { color:var(--green); }
 
-        /* Animations */
+        /* Animations — comfy lazy-reveal */
         @keyframes fade-up { from { opacity:0;transform:translateY(28px); } to { opacity:1;transform:translateY(0); } }
-        .reveal { opacity:0; transform:translateY(22px); transition:opacity 0.7s ease,transform 0.7s ease; }
+        .reveal { opacity:0; transform:translateY(22px); transition:opacity 0.65s ease,transform 0.65s ease; }
         .reveal.visible { opacity:1; transform:translateY(0); }
         .hero-anim { animation:fade-up 0.9s cubic-bezier(0.16,1,0.3,1) both; }
+        /* Comfy warm overrides for existing elements */
+        .btn-primary { background:var(--amber); color:#1a1409; }
+        .btn-primary:hover { background:#fb923c; box-shadow:0 4px 20px rgba(251,191,36,0.35); }
+        ::-webkit-scrollbar-thumb { background:var(--amber); }
+        .site-header { background:rgba(19,17,16,0.90); }
+        /* Playground CTA block */
+        .playground-cta {
+            background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(74,222,128,0.05));
+            border:1px solid rgba(251,191,36,0.25);
+            border-radius:var(--radius-lg);
+            padding:28px 32px;
+            display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+            margin:48px 0;
+        }
+        .playground-cta h2 { font-size:1.3rem;font-weight:800;margin-bottom:6px;color:var(--text); }
+        .playground-cta p  { font-size:0.86rem;color:var(--text-muted);max-width:480px; }
 
         /* Misc */
         code.inline { font-family:var(--mono); font-size:0.84em; background:rgba(255,255,255,0.07); padding:2px 5px; border-radius:4px; color:var(--cyan); }
@@ -1399,6 +1421,20 @@ workflow.add_conditional_edges(<span class="tok-string">"evaluate_threat"</span>
     </div>
 </section>
 
+<!-- PLAYGROUND CTA -->
+<section class="section-sm">
+  <div class="container">
+    <div class="playground-cta reveal">
+      <div style="font-size:3rem;">🐧</div>
+      <div style="flex:1;">
+        <h2>Ready to play? Try the Interactive Playground →</h2>
+        <p>6 live labs — Syscall Interceptor, Verifier Bomb, Ring Buffer, TypeSafe AI, XDP Firewall, K8s AutoSOC. Earn XP, unlock badges. Pure JS, zero backend.</p>
+      </div>
+      <a href="./playground.html" class="btn btn-primary" style="flex-shrink:0;font-size:0.9rem;padding:12px 22px;">🎮 Open Playground</a>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer class="site-footer">
     <div class="container">
@@ -1406,6 +1442,7 @@ workflow.add_conditional_edges(<span class="tok-string">"evaluate_threat"</span>
             <div class="footer-brand">🐧 linux-hpc-security · Systems Engineering from the Metal Up</div>
             <div class="footer-links">
                 <a href="https://satyabhan007.github.io/linux-hpc-security/">Course Home</a>
+                <a href="./playground.html">🎮 Playground</a>
                 <a href="https://github.com/satyabhan007/linux-hpc-security/tree/main/ebpf">eBPF Source</a>
                 <a href="https://satyabhan007.github.io/linux-hpc-security/splunk/DEEP_DIVE.md">Splunk Deep Dive</a>
                 <a href="https://github.com/satyabhan007/linux-hpc-security">GitHub</a>

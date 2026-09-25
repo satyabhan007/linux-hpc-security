@@ -1,0 +1,41 @@
+# Jekyll Configuration — linux-hpc-security
+# GitHub Pages will use this for native Jekyll serving
+
+title: "linux-hpc-security"
+description: "Systems Engineering from the Metal Up — eBPF, HPC, Security, AI"
+url: "https://satyabhan007.github.io"
+baseurl: "/linux-hpc-security"
+author:
+  name: Satya Bhan
+  github: satyabhan007
+
+# Theme
+theme: null
+plugins: []
+
+# Tell Jekyll to pass these files through untouched
+include:
+  - "*.html"
+  - "ebpf/**"
+  - "assets/**"
+
+# Exclude dev files
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - "*.py"
+  - ".github"
+  - "_site"
+  - ".git"
+  - ".vscode"
+  - "node_modules"
+  - "resolve.py"
+  - "update_playground.py"
+
+# Markdown & encoding
+markdown: kramdown
+encoding: utf-8
+
+# Sass (if used later)
+sass:
+  style: compressed
