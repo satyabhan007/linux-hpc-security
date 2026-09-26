@@ -347,6 +347,7 @@
     <a class="tnc-link" href="#test-7"       data-sec="test-7">🔒 Test 7</a>
     <div class="tnc-sep"></div>
     <a class="tnc-link" href="#concepts"     data-sec="concepts">📚 Concepts</a>
+    <a class="tnc-link" href="#advanced-playbook"   data-sec="advanced-playbook">🌟 Playbook</a>
     <a class="tnc-link" href="#playground"   data-sec="playground">🎮 Playground</a>
   </div>
 </header>
@@ -1501,6 +1502,125 @@ workflow.add_conditional_edges(<span class="tok-string">"evaluate_threat"</span>
       <a href="./playground.html" class="btn btn-primary" style="flex-shrink:0;font-size:0.9rem;padding:12px 22px;">🎮 Open Playground</a>
     </div>
   </div>
+</section>
+
+
+<!-- ADVANCED PLAYBOOK -->
+<section class="section section-alt reveal" id="advanced-playbook" style="scroll-margin-top:84px; background:var(--bg-2)">
+    <div class="container">
+        <div class="chapter-header">
+            <div class="chapter-number" style="background:var(--purple-dim);color:var(--purple)">🌟</div>
+            <div class="chapter-meta">
+                <h2>The Advanced Systems & Security Playbook</h2>
+                <p>Interactive simulators for the three core domains: Linux Security (Capabilities/Seccomp), HPC Containers (Apptainer/Spack), and Encrypted Anomaly Detection.</p>
+            </div>
+        </div>
+
+        <div class="card-grid-2">
+            <!-- Domain 1 -->
+            <div class="card" style="border-top:3px solid var(--green)">
+                <div class="card-title">1. The Bank Robbery (Linux Security)</div>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">Auto-generating Seccomp profiles using TypeSafe AI.</p>
+                <div style="background:var(--bg-3);padding:14px;border-radius:var(--radius-sm);margin-bottom:12px;font-family:var(--mono);font-size:0.75rem;color:var(--cyan)">
+                    Input: sys_enter_process_vm_readv<br>
+                    Context: Nginx Web Server
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="runSim1()" style="width:100%;justify-content:center">Ask TypeSafe AI</button>
+                <div id="sim1-result" style="margin-top:12px;padding:12px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);display:none;font-family:var(--mono);font-size:0.8rem"></div>
+            </div>
+
+            <!-- Domain 2 -->
+            <div class="card" style="border-top:3px solid var(--amber)">
+                <div class="card-title">2. The Formula 1 Engine (HPC Containers)</div>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">Autonomous Spack resolution for library conflicts.</p>
+                <div style="background:var(--bg-3);padding:14px;border-radius:var(--radius-sm);margin-bottom:12px;font-family:var(--mono);font-size:0.75rem;color:var(--amber)">
+                    Error: ...massive C++ linker segfault...<br>
+                    Module: OpenMPI + CUDA
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="runSim2()" style="width:100%;justify-content:center;background:var(--amber);color:#000">Ask TypeSafe AI</button>
+                <div id="sim2-result" style="margin-top:12px;padding:12px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm);display:none;font-family:var(--mono);font-size:0.8rem"></div>
+            </div>
+
+            <!-- Domain 3 -->
+            <div class="card" style="border-top:3px solid var(--purple); grid-column: 1 / -1">
+                <div class="card-title">3. The Invisible Man in the Snow (Anomaly Detection)</div>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">The Alert Governor: Evaluating encrypted C2 Beacons via CV and JA3 fingerprints.</p>
+                
+                <div class="card-grid-2">
+                    <div>
+                        <label style="font-size:0.8rem;color:var(--text-muted)">Coefficient of Variation (CV): <span id="cv-val" style="color:var(--purple)">0.179</span></label>
+                        <input type="range" id="cv-slider" min="0" max="250" value="18" style="width:100%; margin-bottom:15px; accent-color:var(--purple);">
+                        
+                        <label style="font-size:0.8rem;color:var(--text-muted)">JA3 Fingerprint Type:</label>
+                        <select id="ja3-select" style="width:100%;padding:8px;background:var(--bg-3);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:15px">
+                            <option value="unknown">Unknown / Custom Script</option>
+                            <option value="crowdstrike">Known: CrowdStrike Updater</option>
+                            <option value="chrome">Known: Chrome Browser</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;flex-direction:column;justify-content:center">
+                        <div id="sim3-result" style="padding:16px;background:var(--bg-3);border:1px solid rgba(168,85,247,0.3);border-radius:var(--radius-sm);text-align:center;font-family:var(--mono);font-size:0.9rem;color:var(--purple)">
+                            🤖 WAITING FOR TELEMETRY
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            function runSim1() {
+                const res = document.getElementById('sim1-result');
+                res.style.display = 'block';
+                res.style.color = 'var(--red)';
+                res.style.borderColor = 'rgba(239,68,68,0.3)';
+                res.innerHTML = "⚡ CHOICE: DENY_KILL<br><span style='color:var(--text-muted);font-size:0.7rem'>Reasoning: process_vm_readv is dangerous for a web server.</span>";
+            }
+            function runSim2() {
+                const res = document.getElementById('sim2-result');
+                res.style.display = 'block';
+                res.style.color = 'var(--cyan)';
+                res.style.borderColor = 'rgba(45,212,191,0.3)';
+                res.innerHTML = "📦 FAILING_PKG: ucx<br>⚡ CHOICE: DISABLE_VARIANT (+cuda)<br><span style='color:var(--text-muted);font-size:0.7rem'>Graph rewritten automatically.</span>";
+            }
+            
+            const cvSlider = document.getElementById('cv-slider');
+            const cvVal = document.getElementById('cv-val');
+            const ja3Select = document.getElementById('ja3-select');
+            const sim3Res = document.getElementById('sim3-result');
+            
+            function updateSim3() {
+                const cv = (cvSlider.value / 100).toFixed(3);
+                cvVal.textContent = cv;
+                const ja3 = ja3Select.value;
+                
+                if (cv < 0.5 && ja3 === 'unknown') {
+                    sim3Res.style.background = 'var(--red-dim)';
+                    sim3Res.style.borderColor = 'rgba(239,68,68,0.3)';
+                    sim3Res.style.color = 'var(--red)';
+                    sim3Res.innerHTML = "⚡ CHOICE: BLOCK_FIREWALL<br><span style='color:var(--text-muted);font-size:0.7rem'>High robotic precision + unknown JA3</span>";
+                } else if (cv < 0.5 && ja3 === 'crowdstrike') {
+                    sim3Res.style.background = 'var(--green-dim)';
+                    sim3Res.style.borderColor = 'rgba(16,185,129,0.3)';
+                    sim3Res.style.color = 'var(--green)';
+                    sim3Res.innerHTML = "✅ CHOICE: IGNORE_BENIGN<br><span style='color:var(--text-muted);font-size:0.7rem'>Known corporate updater beacon</span>";
+                } else if (cv >= 0.5 && ja3 === 'unknown') {
+                    sim3Res.style.background = 'var(--amber-dim)';
+                    sim3Res.style.borderColor = 'rgba(245,158,11,0.3)';
+                    sim3Res.style.color = 'var(--amber)';
+                    sim3Res.innerHTML = "⚠️ CHOICE: PAGE_ANALYST<br><span style='color:var(--text-muted);font-size:0.7rem'>Bursty traffic but untrusted client</span>";
+                } else {
+                    sim3Res.style.background = 'var(--blue-dim)';
+                    sim3Res.style.borderColor = 'rgba(96,165,250,0.3)';
+                    sim3Res.style.color = 'var(--blue)';
+                    sim3Res.innerHTML = "🤖 CHOICE: IGNORE_BENIGN<br><span style='color:var(--text-muted);font-size:0.7rem'>Normal human browsing behavior</span>";
+                }
+            }
+            
+            cvSlider.addEventListener('input', updateSim3);
+            ja3Select.addEventListener('change', updateSim3);
+            updateSim3(); // init
+        </script>
+    </div>
 </section>
 
 <!-- FOOTER -->
